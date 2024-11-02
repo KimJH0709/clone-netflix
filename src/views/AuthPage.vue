@@ -1,7 +1,5 @@
-<!-- src/views/AuthPage.vue -->
 <template>
   <div ref="container" id="container" class="container">
-    <!-- FORM SECTION -->
     <div class="row">
       <!-- SIGN UP -->
       <div class="col align-items-center flex-col sign-up">
@@ -9,21 +7,21 @@
           <div class="form sign-up">
             <div class="input-group">
               <i class="bx bxs-user"></i>
-              <input type="text" placeholder="Username" />
+              <input type="text" v-model="username" placeholder="Username" />
             </div>
             <div class="input-group">
               <i class="bx bx-mail-send"></i>
-              <input type="email" placeholder="Email" />
+              <input type="email" v-model="email" placeholder="Email" />
             </div>
             <div class="input-group">
               <i class="bx bxs-lock-alt"></i>
-              <input type="password" placeholder="Password" />
+              <input type="password" v-model="password" placeholder="Password" />
             </div>
             <div class="input-group">
-              <i class="bx bxs-lock-alt"></i>
-              <input type="password" placeholder="Confirm password" />
+              <i class="bx bxs-key"></i>
+              <input type="text" v-model="apiKey" placeholder="Your TMDB API Key" />
             </div>
-            <button>Sign up</button>
+            <button @click="register">Sign up</button>
             <p>
               <span>Already have an account?</span>
               <b @click="toggle" class="pointer">Sign in here</b>
@@ -31,20 +29,20 @@
           </div>
         </div>
       </div>
-      <!-- END SIGN UP -->
+
       <!-- SIGN IN -->
       <div class="col align-items-center flex-col sign-in">
         <div class="form-wrapper align-items-center">
           <div class="form sign-in">
             <div class="input-group">
               <i class="bx bxs-user"></i>
-              <input type="text" placeholder="Username" />
+              <input type="text" v-model="loginUsername" placeholder="Username" />
             </div>
             <div class="input-group">
               <i class="bx bxs-lock-alt"></i>
-              <input type="password" placeholder="Password" />
+              <input type="password" v-model="loginPassword" placeholder="Password" />
             </div>
-            <button>Sign in</button>
+            <button @click="login">Sign in</button>
             <p>
               <b>Forgot password?</b>
             </p>
@@ -55,52 +53,72 @@
           </div>
         </div>
       </div>
-      <!-- END SIGN IN -->
     </div>
-    <!-- END FORM SECTION -->
-    <!-- CONTENT SECTION -->
-    <div class="row content-row">
-      <!-- SIGN IN CONTENT -->
-      <div class="col align-items-center flex-col">
-        <div class="text sign-in">
-          <h2>Welcome</h2>
-        </div>
-        <div class="img sign-in"></div>
-      </div>
-      <!-- END SIGN IN CONTENT -->
-      <!-- SIGN UP CONTENT -->
-      <div class="col align-items-center flex-col">
-        <div class="img sign-up"></div>
-        <div class="text sign-up">
-          <h2>Join with us</h2>
-        </div>
-      </div>
-      <!-- END SIGN UP CONTENT -->
-    </div>
-    <!-- END CONTENT SECTION -->
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
-  mounted() {
-    // 컴포넌트가 마운트된 후 200ms 뒤에 'sign-in' 클래스를 추가합니다.
-    setTimeout(() => {
-      this.$refs.container.classList.add('sign-in');
-    }, 200);
+  data() {
+    return {
+      username: '',
+      email: '',
+      password: '',
+      apiKey: '',
+      loginUsername: '',
+      loginPassword: '',
+    };
   },
   methods: {
     toggle() {
-      // 'sign-in'과 'sign-up' 클래스를 토글합니다.
       this.$refs.container.classList.toggle('sign-in');
       this.$refs.container.classList.toggle('sign-up');
     },
+    register() {
+      if (this.username && this.password && this.apiKey) {
+        // 회원가입 시, localStorage에 사용자 정보를 저장
+        const user = {
+          username: this.username,
+          password: this.password,
+          apiKey: this.apiKey,
+        };
+        localStorage.setItem(this.username, JSON.stringify(user));
+        alert('Registration successful!');
+        this.toggle();
+      } else {
+        alert('Please fill in all fields');
+      }
+    },
+    async login() {
+      // 로그인 시, localStorage의 사용자 정보를 불러옴
+      const storedUser = JSON.parse(localStorage.getItem(this.loginUsername));
+
+      if (storedUser && this.loginPassword === storedUser.password) {
+        alert('Login successful!');
+        try {
+          const response = await axios.get(
+            `https://api.themoviedb.org/3/movie/popular?api_key=${storedUser.apiKey}`,
+          );
+          alert(`TMDB API called successfully! Fetched ${response.data.results.length} movies.`);
+        } catch (error) {
+          alert(`Failed to call TMDB API: ${error.response ? error.response.data.status_message : error.message}`);
+        }
+      } else {
+        alert('Invalid username or password');
+      }
+    },
+  },
+  mounted() {
+    setTimeout(() => {
+      this.$refs.container.classList.add('sign-in');
+    }, 200);
   },
 };
 </script>
 
 <style>
-/* 스타일을 그대로 붙여넣으세요 */
 :root {
     --primary-color: #4EA685;
     --secondary-color: #57B894;
