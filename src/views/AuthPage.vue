@@ -6,10 +6,6 @@
         <div class="form-wrapper align-items-center">
           <div class="form sign-up">
             <div class="input-group">
-              <i class="bx bxs-user"></i>
-              <input type="text" v-model="username" placeholder="Username" />
-            </div>
-            <div class="input-group">
               <i class="bx bx-mail-send"></i>
               <input type="email" v-model="email" placeholder="Email" />
             </div>
@@ -18,8 +14,15 @@
               <input type="password" v-model="password" placeholder="Password" />
             </div>
             <div class="input-group">
-              <i class="bx bxs-key"></i>
-              <input type="text" v-model="apiKey" placeholder="Your TMDB API Key" />
+              <i class="bx bxs-lock-alt"></i>
+              <input type="password" v-model="confirmPassword" placeholder="Confirm Password" />
+            </div>
+            <div class="input-group checkbox-group">
+              <label class="animated-checkbox">
+                <input type="checkbox" v-model="agreeToTerms" />
+                <span class="checkmark"></span>
+                I agree to the terms and conditions
+              </label>
             </div>
             <button @click="register">Sign up</button>
             <p>
@@ -35,12 +38,26 @@
         <div class="form-wrapper align-items-center">
           <div class="form sign-in">
             <div class="input-group">
-              <i class="bx bxs-user"></i>
-              <input type="text" v-model="loginUsername" placeholder="Username" />
+              <i class="bx bx-mail-send"></i>
+              <input type="email" v-model="loginEmail" placeholder="Email" />
             </div>
             <div class="input-group">
               <i class="bx bxs-lock-alt"></i>
               <input type="password" v-model="loginPassword" placeholder="Password" />
+            </div>
+            <div class="input-group checkbox-group">
+              <label class="animated-checkbox">
+                <input type="checkbox" v-model="rememberMe" />
+                <span class="checkmark"></span>
+                Remember me
+              </label>
+            </div>
+            <div class="input-group checkbox-group">
+              <label class="animated-checkbox">
+                <input type="checkbox" v-model="autoLogin" />
+                <span class="checkmark"></span>
+                Auto login
+              </label>
             </div>
             <button @click="login">Sign in</button>
             <p>
@@ -63,12 +80,14 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      username: '',
       email: '',
       password: '',
-      apiKey: '',
-      loginUsername: '',
+      confirmPassword: '',
+      agreeToTerms: false,
+      loginEmail: '',
       loginPassword: '',
+      rememberMe: false,
+      autoLogin: false,
     };
   },
   methods: {
@@ -77,40 +96,89 @@ export default {
       this.$refs.container.classList.toggle('sign-up');
     },
     register() {
-      if (this.username && this.password && this.apiKey) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.email)) {
+        alert('Please enter a valid email address');
+        return;
+      }
+
+      if (this.email && this.password && this.confirmPassword && this.agreeToTerms) {
+        if (this.password !== this.confirmPassword) {
+          alert('Passwords do not match');
+          return;
+        }
         const user = {
-          username: this.username,
+          email: this.email,
           password: this.password,
-          apiKey: this.apiKey,
         };
-        localStorage.setItem(this.username, JSON.stringify(user));
+        localStorage.setItem(this.email, JSON.stringify(user));
         alert('Registration successful!');
         this.toggle();
       } else {
-        alert('Please fill in all fields');
+        alert('Please fill in all fields and agree to the terms');
       }
     },
     async login() {
-      const storedUser = JSON.parse(localStorage.getItem(this.loginUsername));
+      const storedUser = JSON.parse(localStorage.getItem(this.loginEmail));
 
       if (storedUser && this.loginPassword === storedUser.password) {
         alert('Login successful!');
-        localStorage.setItem('currentUser', this.loginUsername);
+        localStorage.setItem('currentUser', this.loginEmail);
+
+        // Remember Me 기능
+        if (this.rememberMe) {
+          localStorage.setItem('rememberedEmail', this.loginEmail);
+        } else {
+          localStorage.removeItem('rememberedEmail');
+        }
+
+        // Auto Login 기능
+        if (this.autoLogin) {
+          localStorage.setItem('autoLogin', true);
+        } else {
+          localStorage.removeItem('autoLogin');
+        }
+
         this.$router.push({ path: '/' });
         try {
           const response = await axios.get(
-            `https://api.themoviedb.org/3/movie/popular?api_key=${storedUser.apiKey}`,
+            `https://api.themoviedb.org/3/movie/popular?api_key=${storedUser.password}`,
           );
           alert(`TMDB API called successfully! Fetched ${response.data.results.length} movies.`);
         } catch (error) {
           alert(`Failed to call TMDB API: ${error.response ? error.response.data.status_message : error.message}`);
         }
       } else {
-        alert('Invalid username or password');
+        alert('Invalid email or password');
       }
+    },
+    handleLogout() {
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('autoLogin');
+      this.currentUser = null;
+      alert('You have been logged out.');
+      this.$router.push({ path: '/signin' });
     },
   },
   mounted() {
+    if (localStorage.getItem('autoLogin')) {
+      const autoLoginUser = localStorage.getItem('currentUser');
+      if (autoLoginUser) {
+        this.loginEmail = autoLoginUser;
+        const storedUser = JSON.parse(localStorage.getItem(autoLoginUser));
+        if (storedUser) {
+          this.loginPassword = storedUser.password; // 자동으로 저장된 비밀번호로 로그인 시도
+          this.login(); // 자동 로그인 호출
+        }
+      }
+    } else {
+      const rememberedEmail = localStorage.getItem('rememberedEmail');
+      if (rememberedEmail) {
+        this.loginEmail = rememberedEmail;
+        this.rememberMe = true;
+      }
+    }
+
     setTimeout(() => {
       this.$refs.container.classList.add('sign-in');
     }, 200);
@@ -140,6 +208,63 @@ export default {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+.checkbox-group {
+  display: flex;
+  align-items: center;
+}
+
+.animated-checkbox {
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  font-size: 1rem;
+  user-select: none;
+}
+
+.animated-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.animated-checkbox .checkmark {
+  position: relative;
+  height: 20px;
+  width: 20px;
+  background-color: #ccc;
+  border-radius: 5px;
+  transition: background-color 0.3s, transform 0.2s;
+  margin-right: 10px;
+}
+
+.animated-checkbox input:checked ~ .checkmark {
+  background-color: #4ea685;
+  transform: scale(1.1);
+}
+
+.animated-checkbox .checkmark::after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.animated-checkbox input:checked ~ .checkmark::after {
+  display: block;
+}
+
+.animated-checkbox .checkmark:hover {
+  background-color: #b0e3d0;
 }
 
 html,
