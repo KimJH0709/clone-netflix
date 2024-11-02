@@ -26,17 +26,24 @@ export default {
     },
     handleAuthAction() {
       if (this.currentUser) {
+        // 로그아웃 처리
         localStorage.removeItem('currentUser');
         this.currentUser = null;
         alert('You have been logged out.');
         this.$router.push({ path: '/signin' });
       } else {
+        // 로그인 페이지로 이동
         this.goToSignin();
       }
     },
   },
   mounted() {
     this.currentUser = localStorage.getItem('currentUser');
+    if (!this.currentUser) {
+      // 로그인이 되어 있지 않으면 로그인 페이지로 이동
+      alert('You need to log in first.');
+      this.$router.push({ path: '/signin' });
+    }
   },
 };
 </script>
