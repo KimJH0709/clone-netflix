@@ -78,7 +78,6 @@ export default {
     },
     register() {
       if (this.username && this.password && this.apiKey) {
-        // 회원가입 시, localStorage에 사용자 정보를 저장
         const user = {
           username: this.username,
           password: this.password,
@@ -92,11 +91,12 @@ export default {
       }
     },
     async login() {
-      // 로그인 시, localStorage의 사용자 정보를 불러옴
       const storedUser = JSON.parse(localStorage.getItem(this.loginUsername));
 
       if (storedUser && this.loginPassword === storedUser.password) {
         alert('Login successful!');
+        localStorage.setItem('currentUser', this.loginUsername);
+        this.$router.push({ path: '/' });
         try {
           const response = await axios.get(
             `https://api.themoviedb.org/3/movie/popular?api_key=${storedUser.apiKey}`,
