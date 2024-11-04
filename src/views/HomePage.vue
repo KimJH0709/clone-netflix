@@ -6,10 +6,31 @@
       <p>ID: {{ currentUser.email }}</p>
       <p>Password: {{ currentUser.password }}</p>
     </div>
+
     <div v-if="popularMovies.length" class="movies-grid">
       <h2>Popular Movies</h2>
       <div class="movies-container">
         <div class="movie" v-for="movie in popularMovies.slice(0, 20)" :key="movie.id">
+          <img :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`" :alt="movie.title" />
+          <p>{{ movie.title }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="latestMovies.length" class="movies-grid">
+      <h2>Latest Movies</h2>
+      <div class="movies-container">
+        <div class="movie" v-for="movie in latestMovies.slice(0, 20)" :key="movie.id">
+          <img :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`" :alt="movie.title" />
+          <p>{{ movie.title }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="actionMovies.length" class="movies-grid">
+      <h2>Action Movies</h2>
+      <div class="movies-container">
+        <div class="movie" v-for="movie in actionMovies.slice(0, 20)" :key="movie.id">
           <img :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`" :alt="movie.title" />
           <p>{{ movie.title }}</p>
         </div>
@@ -38,7 +59,8 @@ export default {
         this.currentUser = JSON.parse(storedUser);
         const apiKey = this.currentUser.password;
 
-        axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`)
+        // TMDB API 요청에 language 파라미터 추가
+        axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=ko-KR`)
           .then((response) => {
             this.popularMovies = response.data.results;
           })
@@ -46,7 +68,7 @@ export default {
             console.error('Failed to fetch popular movies:', error);
           });
 
-        axios.get(`https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}`)
+        axios.get(`https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=ko-KR`)
           .then((response) => {
             this.latestMovies = response.data.results;
           })
@@ -54,7 +76,7 @@ export default {
             console.error('Failed to fetch latest movies:', error);
           });
 
-        axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=28`)
+        axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=28&language=ko-KR`)
           .then((response) => {
             this.actionMovies = response.data.results;
           })
@@ -126,5 +148,4 @@ body, html {
   margin-top: 10px;
   font-size: 1rem;
 }
-
 </style>
