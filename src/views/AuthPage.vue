@@ -111,6 +111,7 @@ export default {
           email: this.email,
           password: this.password,
         };
+        // JSON 형식으로 저장
         localStorage.setItem(this.email, JSON.stringify(user));
         alert('Registration successful!');
         this.toggle();
@@ -167,8 +168,8 @@ export default {
         this.loginEmail = autoLoginUser;
         const storedUser = JSON.parse(localStorage.getItem(autoLoginUser));
         if (storedUser) {
-          this.loginPassword = storedUser.password; // 자동으로 저장된 비밀번호로 로그인 시도
-          this.login(); // 자동 로그인 호출
+          this.loginPassword = storedUser.password;
+          this.login();
         }
       }
     } else {
