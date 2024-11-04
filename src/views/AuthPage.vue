@@ -75,7 +75,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 
 export default {
   data() {
@@ -111,7 +110,6 @@ export default {
           email: this.email,
           password: this.password,
         };
-        // JSON 형식으로 저장
         localStorage.setItem(this.email, JSON.stringify(user));
         alert('Registration successful!');
         this.toggle();
@@ -120,37 +118,34 @@ export default {
       }
     },
     async login() {
-      const storedUser = JSON.parse(localStorage.getItem(this.loginEmail));
+      try {
+        const storedUser = JSON.parse(localStorage.getItem(this.loginEmail));
 
-      if (storedUser && this.loginPassword === storedUser.password) {
-        alert('Login successful!');
-        localStorage.setItem('currentUser', this.loginEmail);
+        if (storedUser && this.loginPassword === storedUser.password) {
+          alert('Login successful!');
+          localStorage.setItem('currentUser', JSON.stringify(storedUser));
 
-        // Remember Me 기능
-        if (this.rememberMe) {
-          localStorage.setItem('rememberedEmail', this.loginEmail);
+          // Remember Me 기능
+          if (this.rememberMe) {
+            localStorage.setItem('rememberedEmail', this.loginEmail);
+          } else {
+            localStorage.removeItem('rememberedEmail');
+          }
+
+          // Auto Login 기능
+          if (this.autoLogin) {
+            localStorage.setItem('autoLogin', true);
+          } else {
+            localStorage.removeItem('autoLogin');
+          }
+
+          this.$router.push({ path: '/' });
         } else {
-          localStorage.removeItem('rememberedEmail');
+          alert('Invalid email or password');
         }
-
-        // Auto Login 기능
-        if (this.autoLogin) {
-          localStorage.setItem('autoLogin', true);
-        } else {
-          localStorage.removeItem('autoLogin');
-        }
-
-        this.$router.push({ path: '/' });
-        try {
-          const response = await axios.get(
-            `https://api.themoviedb.org/3/movie/popular?api_key=${storedUser.password}`,
-          );
-          alert(`TMDB API called successfully! Fetched ${response.data.results.length} movies.`);
-        } catch (error) {
-          alert(`Failed to call TMDB API: ${error.response ? error.response.data.status_message : error.message}`);
-        }
-      } else {
-        alert('Invalid email or password');
+      } catch (e) {
+        console.error('Failed to parse user data:', e);
+        alert('Error reading user data. Please try again.');
       }
     },
     handleLogout() {
