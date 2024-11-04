@@ -265,14 +265,16 @@ export default {
 
 html,
 body {
-    height: 100vh;
-    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    height: auto;
+    overflow-y: auto;
 }
 
 .container {
     position: relative;
-    min-height: 100vh;
-    overflow: hidden;
+    min-height: 100%;
+    overflow: visible;
 }
 
 .row {

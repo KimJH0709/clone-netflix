@@ -43,6 +43,11 @@ export default {
   padding: 10px 20px;
   background-color: #333;
   color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
 }
 
 .navbar-brand a {

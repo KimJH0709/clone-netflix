@@ -80,12 +80,13 @@ body, html {
   margin: 0;
   padding: 0;
   min-height: 100%;
-  height: auto;
+  height: 100%;
   overflow-y: auto;
 }
 
 .homepage {
   padding: 20px;
+  margin-top: 60px;
 }
 
 .movies-grid {
@@ -125,4 +126,5 @@ body, html {
   margin-top: 10px;
   font-size: 1rem;
 }
+
 </style>
