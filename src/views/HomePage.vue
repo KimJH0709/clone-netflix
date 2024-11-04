@@ -6,31 +6,10 @@
       <p>ID: {{ currentUser.email }}</p>
       <p>Password: {{ currentUser.password }}</p>
     </div>
-
     <div v-if="popularMovies.length" class="movies-grid">
       <h2>Popular Movies</h2>
       <div class="movies-container">
         <div class="movie" v-for="movie in popularMovies.slice(0, 20)" :key="movie.id">
-          <img :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`" :alt="movie.title" />
-          <p>{{ movie.title }}</p>
-        </div>
-      </div>
-    </div>
-
-    <div v-if="latestMovies.length" class="movies-grid">
-      <h2>Latest Movies</h2>
-      <div class="movies-container">
-        <div class="movie" v-for="movie in latestMovies.slice(0, 20)" :key="movie.id">
-          <img :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`" :alt="movie.title" />
-          <p>{{ movie.title }}</p>
-        </div>
-      </div>
-    </div>
-
-    <div v-if="actionMovies.length" class="movies-grid">
-      <h2>Action Movies</h2>
-      <div class="movies-container">
-        <div class="movie" v-for="movie in actionMovies.slice(0, 20)" :key="movie.id">
           <img :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`" :alt="movie.title" />
           <p>{{ movie.title }}</p>
         </div>
@@ -121,12 +100,25 @@ body, html {
 
 .movie {
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s;
 }
 
 .movie img {
   width: 100%;
   height: auto;
   border-radius: 10px;
+  transition: transform 0.3s, filter 0.3s;
+}
+
+.movie:hover img {
+  transform: scale(1.05);
+  filter: brightness(80%);
+}
+
+.movie:hover {
+  transform: translateY(-10px);
 }
 
 .movie p {
