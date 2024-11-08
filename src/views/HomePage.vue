@@ -7,32 +7,71 @@
       <p>Password: {{ currentUser.password }}</p>
     </div>
 
-    <div v-if="popularMovies.length" class="movies-grid">
+    <!-- Popular Movies -->
+    <div v-if="popularMovies.length" class="movie-section">
       <h2>Popular Movies</h2>
-      <div class="movies-container">
-        <div class="movie" v-for="movie in popularMovies.slice(0, 20)" :key="movie.id">
+      <div class="movie-scroll-container">
+        <div
+          class="movie"
+          v-for="movie in popularMovies.slice(0, 20)"
+          :key="movie.id"
+          @mouseenter="showInfo(movie)"
+          @mouseleave="hideInfo"
+        >
           <img :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`" :alt="movie.title" />
-          <p>{{ movie.title }}</p>
+          <div v-if="selectedMovie && selectedMovie.id === movie.id" class="movie-info">
+            <h3>{{ movie.title }}</h3>
+            <p>
+              ⭐ {{ movie.vote_average }} • {{ movie.genre_ids.join(', ') }} • {{ movie.runtime }}분
+            </p>
+            <p>{{ movie.overview }}</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <div v-if="latestMovies.length" class="movies-grid">
+    <!-- Latest Movies -->
+    <div v-if="latestMovies.length" class="movie-section">
       <h2>Latest Movies</h2>
-      <div class="movies-container">
-        <div class="movie" v-for="movie in latestMovies.slice(0, 20)" :key="movie.id">
+      <div class="movie-scroll-container">
+        <div
+          class="movie"
+          v-for="movie in latestMovies.slice(0, 20)"
+          :key="movie.id"
+          @mouseenter="showInfo(movie)"
+          @mouseleave="hideInfo"
+        >
           <img :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`" :alt="movie.title" />
-          <p>{{ movie.title }}</p>
+          <div v-if="selectedMovie && selectedMovie.id === movie.id" class="movie-info">
+            <h3>{{ movie.title }}</h3>
+            <p>
+              ⭐ {{ movie.vote_average }} • {{ movie.genre_ids.join(', ') }} • {{ movie.runtime }}분
+            </p>
+            <p>{{ movie.overview }}</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <div v-if="actionMovies.length" class="movies-grid">
+    <!-- Action Movies -->
+    <div v-if="actionMovies.length" class="movie-section">
       <h2>Action Movies</h2>
-      <div class="movies-container">
-        <div class="movie" v-for="movie in actionMovies.slice(0, 20)" :key="movie.id">
+      <div class="movie-scroll-container">
+        <div
+          class="movie"
+          v-for="movie in actionMovies.slice(0, 20)"
+          :key="movie.id"
+          @mouseenter="showInfo(movie)"
+          @mouseleave="hideInfo"
+        >
           <img :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`" :alt="movie.title" />
-          <p>{{ movie.title }}</p>
+          <div v-if="selectedMovie && selectedMovie.id === movie.id" class="movie-info">
+            <h3>{{ movie.title }}</h3>
+            <p>
+              ⭐ {{ movie.vote_average }} • {{ movie.genre_ids.join(', ') }} • {{ movie.runtime }}분
+            </p>
+            <p>{{ movie.overview }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -50,48 +89,46 @@ export default {
       popularMovies: [],
       latestMovies: [],
       actionMovies: [],
+      selectedMovie: null,
     };
   },
+  methods: {
+    showInfo(movie) {
+      this.selectedMovie = movie;
+    },
+    hideInfo() {
+      this.selectedMovie = null;
+    },
+  },
   mounted() {
-    try {
-      const storedUser = localStorage.getItem('currentUser');
-      if (storedUser) {
-        this.currentUser = JSON.parse(storedUser);
-        const apiKey = this.currentUser.password;
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      this.currentUser = JSON.parse(storedUser);
+      const apiKey = this.currentUser.password;
 
-        // TMDB API 요청에 language 파라미터 추가
-        axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=ko-KR`)
-          .then((response) => {
-            this.popularMovies = response.data.results;
-          })
-          .catch((error) => {
-            console.error('Failed to fetch popular movies:', error);
-          });
+      axios.get(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=ko-KR`)
+        .then((response) => {
+          this.popularMovies = response.data.results;
+        })
+        .catch((error) => {
+          console.error('Failed to fetch popular movies:', error);
+        });
 
-        axios.get(`https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=ko-KR`)
-          .then((response) => {
-            this.latestMovies = response.data.results;
-          })
-          .catch((error) => {
-            console.error('Failed to fetch latest movies:', error);
-          });
+      axios.get(`https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=ko-KR`)
+        .then((response) => {
+          this.latestMovies = response.data.results;
+        })
+        .catch((error) => {
+          console.error('Failed to fetch latest movies:', error);
+        });
 
-        axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=28&language=ko-KR`)
-          .then((response) => {
-            this.actionMovies = response.data.results;
-          })
-          .catch((error) => {
-            console.error('Failed to fetch action movies:', error);
-          });
-      } else {
-        alert('You need to log in first.');
-        this.$router.push({ path: '/signin' });
-      }
-    } catch (e) {
-      console.error('Failed to parse user data:', e);
-      alert('Error reading user data. Please log in again.');
-      localStorage.removeItem('currentUser');
-      this.$router.push({ path: '/signin' });
+      axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=28&language=ko-KR`)
+        .then((response) => {
+          this.actionMovies = response.data.results;
+        })
+        .catch((error) => {
+          console.error('Failed to fetch action movies:', error);
+        });
     }
   },
 };
@@ -111,41 +148,61 @@ body, html {
   margin-top: 60px;
 }
 
-.movies-grid {
-  margin-top: 20px;
+.movie-section {
+  margin-bottom: 40px;
 }
 
-.movies-container {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+.movie-scroll-container {
+  display: flex;
+  overflow-x: auto;
   gap: 20px;
+  padding-bottom: 10px;
 }
 
 .movie {
-  text-align: center;
+  min-width: 200px;
+  height: 300px;
   position: relative;
   overflow: hidden;
-  transition: transform 0.3s;
+  cursor: pointer;
 }
 
 .movie img {
   width: 100%;
-  height: auto;
+  height: 100%;
   border-radius: 10px;
   transition: transform 0.3s, filter 0.3s;
 }
 
 .movie:hover img {
-  transform: scale(1.05);
+  transform: scale(1.1);
   filter: brightness(80%);
 }
 
-.movie:hover {
-  transform: translateY(-10px);
+.movie-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.movie p {
-  margin-top: 10px;
-  font-size: 1rem;
+.movie:hover .movie-info {
+  opacity: 1;
+}
+
+.movie-info h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.movie-info p {
+  margin: 5px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 </style>

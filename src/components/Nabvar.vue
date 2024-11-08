@@ -4,10 +4,10 @@
       <a href="/" class="navbar-logo">MyApp</a>
     </div>
     <ul class="navbar-links">
-      <li><router-link to="/">Home</router-link></li>
-      <li><router-link to="/about">About</router-link></li>
-      <li><router-link to="/contact">Contact</router-link></li>
-      <li><router-link to="/profile">Profile</router-link></li>
+      <li><router-link to="/">메인 페이지</router-link></li>
+      <li><router-link to="/popular">대세 컨텐츠 페이지</router-link></li>
+      <li><router-link to="/search">찾아보기 페이지</router-link></li>
+      <li><router-link to="/wishlist">내가 찜한 리스트 페이지</router-link></li>
     </ul>
     <button v-if="currentUser" @click="logout" class="auth-button">로그아웃</button>
   </nav>
