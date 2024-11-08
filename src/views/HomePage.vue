@@ -30,15 +30,9 @@
           class="movie"
           v-for="movie in popularMovies.slice(0, 20)"
           :key="movie.id"
-          @mouseenter="showInfo(movie)"
-          @mouseleave="hideInfo"
+          @click="openModal(movie)"
         >
           <img :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`" :alt="movie.title" />
-          <div v-if="selectedMovie && selectedMovie.id === movie.id" class="movie-info">
-            <h3>{{ movie.title }}</h3>
-            <p>⭐ {{ movie.vote_average }} • {{ movie.runtime }}분</p>
-            <p>{{ movie.overview }}</p>
-          </div>
         </div>
       </div>
     </div>
@@ -51,16 +45,20 @@
           class="movie"
           v-for="movie in latestMovies.slice(0, 20)"
           :key="movie.id"
-          @mouseenter="showInfo(movie)"
-          @mouseleave="hideInfo"
+          @click="openModal(movie)"
         >
           <img :src="`https://image.tmdb.org/t/p/w500${movie.poster_path}`" :alt="movie.title" />
-          <div v-if="selectedMovie && selectedMovie.id === movie.id" class="movie-info">
-            <h3>{{ movie.title }}</h3>
-            <p>⭐ {{ movie.vote_average }} • {{ movie.runtime }}분</p>
-            <p>{{ movie.overview }}</p>
-          </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Movie Detail Modal -->
+    <div v-if="isModalOpen" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <button class="close-button" @click="closeModal">X</button>
+        <img :src="`https://image.tmdb.org/t/p/w500${selectedMovie.poster_path}`" :alt="selectedMovie.title" />
+        <h2>{{ selectedMovie.title }}</h2>
+        <p>{{ selectedMovie.overview }}</p>
       </div>
     </div>
   </div>
@@ -77,18 +75,13 @@ export default {
       topMovies: [],
       popularMovies: [],
       latestMovies: [],
-      selectedMovie: null,
       currentIndex: 0,
       intervalId: null,
+      isModalOpen: false,
+      selectedMovie: null,
     };
   },
   methods: {
-    showInfo(movie) {
-      this.selectedMovie = movie;
-    },
-    hideInfo() {
-      this.selectedMovie = null;
-    },
     nextMovie() {
       this.currentIndex = (this.currentIndex + 1) % this.topMovies.length;
     },
@@ -100,6 +93,14 @@ export default {
     },
     stopAutoSlide() {
       clearInterval(this.intervalId);
+    },
+    openModal(movie) {
+      this.selectedMovie = movie;
+      this.isModalOpen = true;
+    },
+    closeModal() {
+      this.isModalOpen = false;
+      this.selectedMovie = null;
     },
   },
   mounted() {
@@ -245,38 +246,60 @@ body, html {
   width: 100%;
   height: 100%;
   border-radius: 10px;
-  transition: transform 0.3s, filter 0.3s;
+  transition: filter 0.3s;
 }
 
 .movie:hover img {
-  transform: scale(1.1);
   filter: brightness(80%);
 }
 
-.movie-info {
-  position: absolute;
-  bottom: 0;
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
   left: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.8);
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  max-width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+.modal-content img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.modal-content h2 {
+  margin-top: 15px;
+}
+
+.modal-content p {
+  font-size: 1rem;
+  color: #333;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #f00;
   color: white;
-  padding: 10px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.movie:hover .movie-info {
-  opacity: 1;
-}
-
-.movie-info h3 {
-  margin: 0;
-  font-size: 1.2rem;
-}
-
-.movie-info p {
-  margin: 5px 0 0;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  border: none;
+  border-radius: 50%;
+  padding: 5px 10px;
+  cursor: pointer;
 }
 </style>
