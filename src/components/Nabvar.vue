@@ -1,16 +1,20 @@
 <template>
-  <nav class="navbar">
-    <div class="navbar-brand">
-      <a href="/" class="navbar-logo">MyApp</a>
+  <div> <!-- 모든 내용을 감싸는 루트 요소 추가 -->
+    <nav class="navbar">
+      <div class="navbar-brand">
+        <a href="/" class="navbar-logo">MyApp</a>
+      </div>
+      <ul class="navbar-links">
+        <li><router-link to="/">메인 페이지</router-link></li>
+        <li><router-link to="/popular">대세 컨텐츠 페이지</router-link></li>
+        <li><router-link to="/search">찾아보기 페이지</router-link></li>
+        <li><router-link to="/wishlist">내가 찜한 리스트 페이지</router-link></li>
+      </ul>
+      <button v-if="currentUser" @click="logout" class="auth-button">로그아웃</button>
+    </nav>
+    <div class="content">
     </div>
-    <ul class="navbar-links">
-      <li><router-link to="/">메인 페이지</router-link></li>
-      <li><router-link to="/popular">대세 컨텐츠 페이지</router-link></li>
-      <li><router-link to="/search">찾아보기 페이지</router-link></li>
-      <li><router-link to="/wishlist">내가 찜한 리스트 페이지</router-link></li>
-    </ul>
-    <button v-if="currentUser" @click="logout" class="auth-button">로그아웃</button>
-  </nav>
+  </div>
 </template>
 
 <script>
@@ -48,6 +52,7 @@ export default {
   left: 0;
   width: 100%;
   z-index: 1000;
+  height: 60px;
 }
 
 .navbar-brand a {
@@ -87,5 +92,9 @@ export default {
 
 .auth-button:hover {
   background-color: #f40612;
+}
+
+.content {
+  padding-top: 60px;
 }
 </style>
