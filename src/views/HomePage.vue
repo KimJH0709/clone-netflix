@@ -59,6 +59,7 @@
         <img :src="`https://image.tmdb.org/t/p/w500${selectedMovie.poster_path}`" :alt="selectedMovie.title" />
         <h2>{{ selectedMovie.title }}</h2>
         <p>{{ selectedMovie.overview }}</p>
+        <button @click="addToWishlist(selectedMovie)">찜하기</button>
       </div>
     </div>
   </div>
@@ -101,6 +102,16 @@ export default {
     closeModal() {
       this.isModalOpen = false;
       this.selectedMovie = null;
+    },
+    addToWishlist(movie) {
+      const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+      if (!wishlist.some((item) => item.id === movie.id)) {
+        wishlist.push(movie);
+        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+        alert('영화가 찜 목록에 추가되었습니다.');
+      } else {
+        alert('이미 찜 목록에 추가된 영화입니다.');
+      }
     },
   },
   mounted() {
