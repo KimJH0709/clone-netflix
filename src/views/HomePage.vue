@@ -104,10 +104,17 @@ export default {
       this.selectedMovie = null;
     },
     addToWishlist(movie) {
-      const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+      if (!this.currentUser) {
+        alert('로그인이 필요합니다.');
+        return;
+      }
+
+      const wishlistKey = `wishlist_${this.currentUser.email}`;
+      const wishlist = JSON.parse(localStorage.getItem(wishlistKey)) || [];
+
       if (!wishlist.some((item) => item.id === movie.id)) {
         wishlist.push(movie);
-        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+        localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
         alert('영화가 찜 목록에 추가되었습니다.');
       } else {
         alert('이미 찜 목록에 추가된 영화입니다.');
