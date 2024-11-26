@@ -13,7 +13,7 @@
     <!-- Table View -->
     <div v-if="isTableView" class="table-view">
       <div v-if="paginatedMovies.length" class="table">
-        <div v-for="row in chunkMovies(paginatedMovies, 5)" :key="row[0].id" class="table-row">
+        <div v-for="row in chunkMovies(paginatedMovies, 5)" :key="row[0]?.id" class="table-row">
           <div v-for="movie in row" :key="movie.id" class="table-cell">
             <img :src="`https://image.tmdb.org/t/p/w200${movie.poster_path}`" :alt="movie.title" />
             <h3>{{ movie.title }}</h3>
@@ -32,8 +32,8 @@
 
     <!-- Infinite Scroll View -->
     <div v-else class="infinite-scroll-view">
-      <div v-if="movies.length" class="movies-grid">
-        <div v-for="movie in movies" :key="movie.id" class="movie-card">
+      <div v-if="infiniteMovies.length" class="movies-grid">
+        <div v-for="movie in infiniteMovies" :key="movie.id" class="movie-card">
           <img :src="`https://image.tmdb.org/t/p/w200${movie.poster_path}`" :alt="movie.title" />
           <h3>{{ movie.title }}</h3>
         </div>
@@ -56,9 +56,11 @@ export default {
   name: 'PopularPage',
   data() {
     return {
-      movies: [],
+      tableMovies: [],
+      infiniteMovies: [],
       currentPage: 1,
       moviesPerPage: 15,
+      totalMovies: 150,
       isTableView: true,
       loading: false,
       showTopButton: false,
@@ -66,16 +68,42 @@ export default {
   },
   computed: {
     totalPages() {
-      return Math.ceil(this.movies.length / this.moviesPerPage);
+      return Math.ceil(this.totalMovies / this.moviesPerPage);
     },
     paginatedMovies() {
       const start = (this.currentPage - 1) * this.moviesPerPage;
       const end = start + this.moviesPerPage;
-      return this.movies.slice(start, end);
+      return this.tableMovies.slice(start, end);
     },
   },
   methods: {
-    async fetchMovies(page = 1) {
+    async fetchTableMovies() {
+      try {
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser || !currentUser.password) {
+          alert('로그인이 필요합니다.');
+          this.$router.push('/signin');
+          return;
+        }
+        const apiKey = currentUser.password;
+
+        this.loading = true;
+        const response = await axios.get(
+          `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=ko-KR&region=KR`,
+        );
+        this.loading = false;
+
+        this.tableMovies = Array.from({ length: this.totalMovies }, (_, i) => ({
+          ...response.data.results[i % response.data.results.length],
+          id: i + 1,
+        }));
+      } catch (error) {
+        this.loading = false;
+        console.error('영화 데이터를 가져오는 데 실패했습니다:', error);
+        alert('영화 데이터를 가져오는 데 실패했습니다.');
+      }
+    },
+    async fetchInfiniteMovies(page = 1) {
       try {
         const currentUser = JSON.parse(localStorage.getItem('currentUser'));
         if (!currentUser || !currentUser.password) {
@@ -91,11 +119,7 @@ export default {
         );
         this.loading = false;
 
-        if (this.isTableView) {
-          this.movies = response.data.results;
-        } else {
-          this.movies = [...this.movies, ...response.data.results];
-        }
+        this.infiniteMovies = [...this.infiniteMovies, ...response.data.results];
       } catch (error) {
         this.loading = false;
         console.error('영화 데이터를 가져오는 데 실패했습니다:', error);
@@ -108,8 +132,8 @@ export default {
     },
     setInfiniteScrollView() {
       this.isTableView = false;
-      this.movies = [];
-      this.fetchMovies();
+      this.infiniteMovies = [];
+      this.fetchInfiniteMovies();
     },
     prevPage() {
       if (this.currentPage > 1) {
@@ -136,8 +160,8 @@ export default {
       this.showTopButton = scrollTop > 300;
 
       if (scrollTop + clientHeight >= scrollHeight - 50 && !this.loading) {
-        const nextPage = Math.floor(this.movies.length / 20) + 1;
-        this.fetchMovies(nextPage);
+        const nextPage = Math.floor(this.infiniteMovies.length / 20) + 1;
+        this.fetchInfiniteMovies(nextPage);
       }
     },
     scrollToTop() {
@@ -145,7 +169,7 @@ export default {
     },
   },
   mounted() {
-    this.fetchMovies();
+    this.fetchTableMovies();
     window.addEventListener('scroll', this.handleScroll);
   },
   beforeDestroy() {
@@ -155,10 +179,8 @@ export default {
 </script>
 
 <style scoped>
-/* 페이지 공통 스타일 */
 .popular-page {
   padding: 20px;
-  text-align: center;
 }
 
 .page-title {
@@ -166,12 +188,11 @@ export default {
   margin-bottom: 20px;
 }
 
-/* View 버튼 */
 .view-selector {
   display: flex;
-  justify-content: flex-end; /* 오른쪽 정렬 */
+  justify-content: flex-end;
   margin-bottom: 20px;
-  gap: 10px; /* 버튼 간 간격 */
+  gap: 10px;
 }
 
 .view-selector button {
@@ -181,28 +202,12 @@ export default {
   background-color: #e50914;
   color: white;
   border-radius: 5px;
+}
+
+.movies-grid {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1rem;
-  transition: background-color 0.3s;
-}
-
-.view-selector button.active {
-  background-color: #b20710;
-}
-
-.view-selector button i {
-  font-size: 1.2rem;
-}
-
-.view-selector button:hover {
-  background-color: #d8111b;
-}
-
-.table-view .table {
-  display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 15px;
 }
 
@@ -212,128 +217,9 @@ export default {
   gap: 10px;
 }
 
-.table-cell {
-  flex: 1;
-  text-align: center;
-  max-width: 160px;
-}
-
-.table-cell img {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 2 / 3;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-bottom: 5px;
-}
-
-.table-cell h3 {
-  font-size: 0.9rem;
-  color: #333;
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.pagination button {
-  padding: 5px 10px;
-  background-color: #e50914;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.pagination button:disabled {
-  background-color: #ddd;
-  color: #999;
-  cursor: not-allowed;
-}
-
-.movies-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-}
-
-.movie-card {
-  width: 150px;
-  text-align: center;
-}
-
+.table-cell img,
 .movie-card img {
-  width: 100%;
-  height: auto;
   aspect-ratio: 2 / 3;
   object-fit: cover;
-  border-radius: 10px;
-}
-
-.movie-card h3 {
-  font-size: 0.9rem;
-  color: #333;
-  margin-top: 5px;
-}
-
-.loading {
-  text-align: center;
-  margin-top: 20px;
-  font-size: 1.2rem;
-}
-
-/* Top 버튼 */
-.to-top {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: #e50914;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 50%;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.to-top:hover {
-  background-color: #b20710;
-}
-
-@media (max-width: 768px) {
-  .table-row {
-    flex-wrap: wrap;
-  }
-
-  .table-cell {
-    max-width: 45%;
-  }
-
-  .movie-card {
-    width: 45%;
-  }
-
-  .view-selector {
-    justify-content: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .table-cell {
-    max-width: 100%;
-  }
-
-  .movie-card {
-    width: 100%;
-  }
-
-  .view-selector {
-    flex-direction: column;
-    gap: 5px;
-  }
 }
 </style>
