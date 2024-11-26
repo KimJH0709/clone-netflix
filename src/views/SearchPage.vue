@@ -23,20 +23,21 @@
       <button @click="resetFilters">초기화</button>
     </div>
 
-    <div class="infinite-scroll-view">
-      <div v-if="movies.length" class="movies-grid">
-        <div v-for="movie in movies" :key="movie.id" class="movie-card">
+    <div v-if="paginatedMovies.length" class="table-view">
+      <div v-for="row in chunkMovies(paginatedMovies, 5)" :key="row[0]?.id" class="table-row">
+        <div v-for="movie in row" :key="movie.id" class="table-cell">
           <img :src="`https://image.tmdb.org/t/p/w200${movie.poster_path}`" :alt="movie.title" />
           <h3>{{ movie.title }}</h3>
         </div>
-        <div v-if="loading" class="loading">로딩 중...</div>
       </div>
-      <div v-else>
-        <p>영화 데이터를 불러올 수 없습니다.</p>
+      <div class="pagination">
+        <button @click="prevPage" :disabled="currentPage === 1">이전</button>
+        <span>페이지 {{ currentPage }} / {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage === totalPages">다음</button>
       </div>
-      <button v-show="showTopButton" class="to-top" @click="scrollToTop">
-        맨 위로
-      </button>
+    </div>
+    <div v-else>
+      <p>영화 데이터를 불러올 수 없습니다.</p>
     </div>
   </div>
 </template>
@@ -50,8 +51,8 @@ export default {
     return {
       movies: [],
       currentPage: 1,
-      loading: false,
-      showTopButton: false,
+      moviesPerPage: 10,
+      totalPages: 10,
       genres: [
         { id: 28, name: '액션' },
         { id: 12, name: '모험' },
@@ -64,29 +65,49 @@ export default {
       selectedSort: 'popularity.desc',
     };
   },
+  computed: {
+    paginatedMovies() {
+      const start = (this.currentPage - 1) * this.moviesPerPage;
+      const end = start + this.moviesPerPage;
+      return this.movies.slice(start, end);
+    },
+  },
   methods: {
-    async fetchMovies(page = 1) {
+    async fetchMovies() {
       try {
         const apiKey = JSON.parse(localStorage.getItem('currentUser')).password;
-
-        this.loading = true;
         const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
           params: {
             api_key: apiKey,
             language: 'ko-KR',
-            page,
+            sort_by: this.selectedSort,
             with_genres: this.selectedGenre,
             'vote_average.gte': this.selectedRating,
-            sort_by: this.selectedSort,
+            page: 1,
           },
         });
-        this.loading = false;
-
-        this.movies = [...this.movies, ...response.data.results];
+        this.movies = response.data.results
+          .slice(0, this.moviesPerPage * this.totalPages);
       } catch (error) {
-        this.loading = false;
         console.error('영화 데이터를 가져오는 데 실패했습니다:', error);
         alert('영화 데이터를 가져오는 데 실패했습니다.');
+      }
+    },
+    chunkMovies(movies, chunkSize) {
+      const chunks = [];
+      for (let i = 0; i < movies.length; i += chunkSize) {
+        chunks.push(movies.slice(i, i + chunkSize));
+      }
+      return chunks;
+    },
+    prevPage() {
+      if (this.currentPage > 1) {
+        this.currentPage -= 1;
+      }
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage += 1;
       }
     },
     applyFilters() {
@@ -100,24 +121,9 @@ export default {
       this.selectedSort = 'popularity.desc';
       this.applyFilters();
     },
-    scrollToTop() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
   },
   mounted() {
     this.fetchMovies();
-    window.addEventListener('scroll', () => {
-      const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-      const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
-      const clientHeight = document.documentElement.clientHeight || window.innerHeight;
-
-      this.showTopButton = scrollTop > 300;
-
-      if (scrollTop + clientHeight >= scrollHeight - 50 && !this.loading) {
-        this.currentPage += 1;
-        this.fetchMovies(this.currentPage);
-      }
-    });
   },
 };
 </script>
@@ -135,19 +141,24 @@ export default {
   font-size: 1rem;
 }
 
-.movies-grid {
+.table-view {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.movie-card {
-  width: 150px;
+.table-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.table-cell {
+  flex: 1;
   text-align: center;
 }
 
-.movie-card img {
+.table-cell img {
   width: 100%;
   height: auto;
   aspect-ratio: 2 / 3;
@@ -155,26 +166,30 @@ export default {
   border-radius: 10px;
 }
 
-.loading {
-  text-align: center;
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
   margin-top: 20px;
-  font-size: 1.2rem;
 }
 
-.to-top {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
+.pagination button {
+  padding: 10px 20px;
   background-color: #e50914;
   color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 50%;
-  font-size: 1.5rem;
+  border-radius: 5px;
   cursor: pointer;
 }
 
-.to-top:hover {
-  background-color: #b20710;
+.pagination button:disabled {
+  background-color: #ddd;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  display: flex;
+  align-items: center;
 }
 </style>
