@@ -52,7 +52,13 @@ export default {
       currentPage: 1,
       loading: false,
       showTopButton: false,
-      genres: [],
+      genres: [
+        { id: 28, name: '액션' },
+        { id: 12, name: '모험' },
+        { id: 35, name: '코미디' },
+        { id: 80, name: '범죄' },
+        { id: 16, name: '애니메이션' },
+      ],
       selectedGenre: '',
       selectedRating: '',
       selectedSort: 'popularity.desc',
@@ -61,28 +67,19 @@ export default {
   methods: {
     async fetchMovies(page = 1) {
       try {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (!currentUser || !currentUser.password) {
-          alert('로그인이 필요합니다.');
-          this.$router.push('/signin');
-          return;
-        }
-        const apiKey = currentUser.password;
+        const apiKey = JSON.parse(localStorage.getItem('currentUser')).password;
 
         this.loading = true;
-        const response = await axios.get(
-          'https://api.themoviedb.org/3/discover/movie',
-          {
-            params: {
-              api_key: apiKey,
-              language: 'ko-KR',
-              page,
-              with_genres: this.selectedGenre,
-              'vote_average.gte': this.selectedRating,
-              sort_by: this.selectedSort,
-            },
+        const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
+          params: {
+            api_key: apiKey,
+            language: 'ko-KR',
+            page,
+            with_genres: this.selectedGenre,
+            'vote_average.gte': this.selectedRating,
+            sort_by: this.selectedSort,
           },
-        );
+        });
         this.loading = false;
 
         this.movies = [...this.movies, ...response.data.results];
@@ -90,25 +87,6 @@ export default {
         this.loading = false;
         console.error('영화 데이터를 가져오는 데 실패했습니다:', error);
         alert('영화 데이터를 가져오는 데 실패했습니다.');
-      }
-    },
-    async fetchGenres() {
-      try {
-        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-        if (!currentUser || !currentUser.password) {
-          alert('로그인이 필요합니다.');
-          this.$router.push('/signin');
-          return;
-        }
-        const apiKey = currentUser.password;
-
-        const response = await axios.get(
-          'https://api.themoviedb.org/3/genre/movie/list',
-          { params: { api_key: apiKey, language: 'ko-KR' } },
-        );
-        this.genres = response.data.genres;
-      } catch (error) {
-        console.error('장르 데이터를 가져오는 데 실패했습니다:', error);
       }
     },
     applyFilters() {
@@ -127,7 +105,6 @@ export default {
     },
   },
   mounted() {
-    this.fetchGenres();
     this.fetchMovies();
     window.addEventListener('scroll', () => {
       const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
