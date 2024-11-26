@@ -1,6 +1,6 @@
 <template>
   <div class="popular-page">
-    <h1>대세 콘텐츠</h1>
+    <h1 class="page-title">대세 콘텐츠</h1>
     <div class="view-selector">
       <button :class="{ active: isTableView }" @click="setTableView">
         <i class="fas fa-th"></i> Table View
@@ -43,7 +43,7 @@
         <p>영화 데이터를 불러올 수 없습니다.</p>
       </div>
       <button v-show="showTopButton" class="to-top" @click="scrollToTop">
-        <i class="fas fa-arrow-up"></i> 맨 위로
+        <i class="fas fa-arrow-up"></i>
       </button>
     </div>
   </div>
@@ -153,20 +153,28 @@ export default {
   },
 };
 </script>
+
 <style scoped>
+/* 페이지 공통 스타일 */
 .popular-page {
   padding: 20px;
   text-align: center;
 }
 
-.view-selector {
-  display: flex;
-  justify-content: center;
+.page-title {
+  font-size: 2rem;
   margin-bottom: 20px;
 }
 
+/* View 버튼 */
+.view-selector {
+  display: flex;
+  justify-content: flex-end; /* 오른쪽 정렬 */
+  margin-bottom: 20px;
+  gap: 10px; /* 버튼 간 간격 */
+}
+
 .view-selector button {
-  margin-right: 10px;
   padding: 10px 20px;
   border: none;
   cursor: pointer;
@@ -175,7 +183,7 @@ export default {
   border-radius: 5px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-size: 1rem;
   transition: background-color 0.3s;
 }
@@ -192,7 +200,6 @@ export default {
   background-color: #d8111b;
 }
 
-/* Table View */
 .table-view .table {
   display: flex;
   flex-direction: column;
@@ -202,19 +209,19 @@ export default {
 .table-row {
   display: flex;
   justify-content: space-between;
-  gap: 15px;
+  gap: 10px;
 }
 
 .table-cell {
-  text-align: center;
   flex: 1;
+  text-align: center;
   max-width: 160px;
-  overflow: hidden;
 }
 
 .table-cell img {
   width: 100%;
-  height: 200px;
+  height: auto;
+  aspect-ratio: 2 / 3;
   object-fit: cover;
   border-radius: 10px;
   margin-bottom: 5px;
@@ -225,7 +232,6 @@ export default {
   color: #333;
 }
 
-/* Pagination */
 .pagination {
   display: flex;
   justify-content: center;
@@ -248,22 +254,22 @@ export default {
   cursor: not-allowed;
 }
 
-/* Infinite Scroll View */
 .movies-grid {
   display: flex;
   flex-wrap: wrap;
+  gap: 10px;
   justify-content: center;
-  gap: 15px;
 }
 
 .movie-card {
-  width: 160px;
+  width: 150px;
   text-align: center;
 }
 
 .movie-card img {
   width: 100%;
-  height: 200px;
+  height: auto;
+  aspect-ratio: 2 / 3;
   object-fit: cover;
   border-radius: 10px;
 }
@@ -280,6 +286,7 @@ export default {
   font-size: 1.2rem;
 }
 
+/* Top 버튼 */
 .to-top {
   position: fixed;
   bottom: 20px;
@@ -295,5 +302,38 @@ export default {
 
 .to-top:hover {
   background-color: #b20710;
+}
+
+@media (max-width: 768px) {
+  .table-row {
+    flex-wrap: wrap;
+  }
+
+  .table-cell {
+    max-width: 45%;
+  }
+
+  .movie-card {
+    width: 45%;
+  }
+
+  .view-selector {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .table-cell {
+    max-width: 100%;
+  }
+
+  .movie-card {
+    width: 100%;
+  }
+
+  .view-selector {
+    flex-direction: column;
+    gap: 5px;
+  }
 }
 </style>
