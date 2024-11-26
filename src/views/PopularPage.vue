@@ -2,10 +2,12 @@
   <div class="popular-page">
     <h1>대세 콘텐츠</h1>
     <div class="view-selector">
-      <button :class="{ active: isTableView }"
-      @click="setTableView">Table View</button>
-      <button :class="{ active: !isTableView }"
-      @click="setInfiniteScrollView">Infinite Scroll View</button>
+      <button :class="{ active: isTableView }" @click="setTableView">
+        <i class="fas fa-th"></i> Table View
+      </button>
+      <button :class="{ active: !isTableView }" @click="setInfiniteScrollView">
+        <i class="fas fa-stream"></i> Infinite Scroll View
+      </button>
     </div>
 
     <!-- Table View -->
@@ -40,7 +42,9 @@
       <div v-else>
         <p>영화 데이터를 불러올 수 없습니다.</p>
       </div>
-      <button v-show="showTopButton" class="to-top" @click="scrollToTop">맨 위로</button>
+      <button v-show="showTopButton" class="to-top" @click="scrollToTop">
+        <i class="fas fa-arrow-up"></i> 맨 위로
+      </button>
     </div>
   </div>
 </template>
@@ -52,12 +56,12 @@ export default {
   name: 'PopularPage',
   data() {
     return {
-      movies: [], // 전체 영화 데이터
-      currentPage: 1, // 현재 페이지 (Table View)
-      moviesPerPage: 15, // 페이지당 영화 수 (Table View)
-      isTableView: true, // 현재 View 모드
-      loading: false, // 로딩 상태 (Infinite Scroll)
-      showTopButton: false, // "맨 위로" 버튼 표시 여부
+      movies: [],
+      currentPage: 1,
+      moviesPerPage: 15,
+      isTableView: true,
+      loading: false,
+      showTopButton: false,
     };
   },
   computed: {
@@ -149,13 +153,15 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 .popular-page {
   padding: 20px;
+  text-align: center;
 }
 
 .view-selector {
+  display: flex;
+  justify-content: center;
   margin-bottom: 20px;
 }
 
@@ -167,63 +173,110 @@ export default {
   background-color: #e50914;
   color: white;
   border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+  transition: background-color 0.3s;
 }
 
 .view-selector button.active {
   background-color: #b20710;
 }
 
+.view-selector button i {
+  font-size: 1.2rem;
+}
+
+.view-selector button:hover {
+  background-color: #d8111b;
+}
+
+/* Table View */
 .table-view .table {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
 }
 
 .table-row {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
+  gap: 15px;
 }
 
 .table-cell {
-  flex: 1;
   text-align: center;
+  flex: 1;
+  max-width: 160px;
+  overflow: hidden;
 }
 
 .table-cell img {
   width: 100%;
-  height: 150px;
+  height: 200px;
   object-fit: cover;
   border-radius: 10px;
+  margin-bottom: 5px;
 }
 
+.table-cell h3 {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+/* Pagination */
 .pagination {
   display: flex;
   justify-content: center;
+  gap: 15px;
   margin-top: 20px;
-  gap: 10px;
 }
 
+.pagination button {
+  padding: 5px 10px;
+  background-color: #e50914;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background-color: #ddd;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Infinite Scroll View */
 .movies-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  justify-content: center;
+  gap: 15px;
 }
 
 .movie-card {
-  width: 150px;
+  width: 160px;
   text-align: center;
 }
 
 .movie-card img {
   width: 100%;
-  height: auto;
+  height: 200px;
+  object-fit: cover;
   border-radius: 10px;
+}
+
+.movie-card h3 {
+  font-size: 0.9rem;
+  color: #333;
+  margin-top: 5px;
 }
 
 .loading {
   text-align: center;
-  margin: 20px 0;
+  margin-top: 20px;
   font-size: 1.2rem;
 }
 
@@ -235,7 +288,8 @@ export default {
   color: white;
   border: none;
   padding: 10px 20px;
-  border-radius: 5px;
+  border-radius: 50%;
+  font-size: 1.5rem;
   cursor: pointer;
 }
 
