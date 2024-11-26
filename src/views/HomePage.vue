@@ -1,12 +1,5 @@
 <template>
   <div class="homepage">
-    <h1>Netflix Clone</h1>
-    <div v-if="currentUser" class="user-info">
-      <p>Welcome, {{ currentUser.email }}!</p>
-      <p>ID: {{ currentUser.email }}</p>
-      <p>Password: {{ currentUser.password }}</p>
-    </div>
-
     <!-- Top 5 Popular Movies Section -->
     <div v-if="topMovies.length" class="top-movies-container">
       <button class="arrow left-arrow" @click="prevMovie">〈</button>
@@ -164,7 +157,6 @@ body, html {
 
 .homepage {
   padding: 20px;
-  margin-top: 60px;
 }
 
 .top-movies-container {
