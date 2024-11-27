@@ -27,7 +27,6 @@
       <div v-for="row in chunkMovies(movies, 5)" :key="row[0]?.id" class="table-row">
         <div v-for="movie in row" :key="movie.id" class="table-cell">
           <img :src="`https://image.tmdb.org/t/p/w200${movie.poster_path}`" :alt="movie.title" />
-          <h3>{{ movie.title }}</h3>
         </div>
       </div>
       <div class="pagination">
@@ -49,10 +48,10 @@ export default {
   name: 'SearchPage',
   data() {
     return {
-      movies: [], // 현재 페이지의 영화 데이터만 저장
+      movies: [],
       currentPage: 1,
-      moviesPerPage: 10, // 한 페이지에 표시할 영화 수
-      totalPages: 1, // 전체 페이지 수 계산
+      moviesPerPage: 10,
+      totalPages: 1,
       genres: [
         { id: 28, name: '액션' },
         { id: 12, name: '모험' },
@@ -79,13 +78,15 @@ export default {
             sort_by: this.selectedSort,
             with_genres: this.selectedGenre,
             'vote_average.gte': this.selectedRating,
-            page: this.currentPage, // 현재 페이지에 해당하는 데이터만 요청
+            page: this.currentPage,
           },
         });
         this.loading = false;
 
         this.movies = response.data.results;
-        this.totalPages = Math.ceil(response.data.total_results / this.moviesPerPage);
+
+        const calculatedTotalPages = Math.ceil(response.data.total_results / this.moviesPerPage);
+        this.totalPages = Math.min(calculatedTotalPages, 10);
       } catch (error) {
         this.loading = false;
         console.error('영화 데이터를 가져오는 데 실패했습니다:', error);
@@ -155,11 +156,11 @@ export default {
 }
 
 .table-cell img {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 2 / 3;
+  width: 150px;
+  height: 225px;
   object-fit: cover;
   border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .pagination {
