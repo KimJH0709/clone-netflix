@@ -17,7 +17,7 @@
 
     <!-- Popular Movies -->
     <div v-if="popularMovies.length" class="movie-section">
-      <h2>Popular Movies</h2>
+      <h2>인기 영화</h2>
       <div class="movie-scroll-container">
         <div
           class="movie"
@@ -32,7 +32,7 @@
 
     <!-- Latest Movies -->
     <div v-if="latestMovies.length" class="movie-section">
-      <h2>Latest Movies</h2>
+      <h2>최신 영화</h2>
       <div class="movie-scroll-container">
         <div
           class="movie"
@@ -232,7 +232,6 @@ body, html {
   right: 10px;
 }
 
-/* Horizontal Scrollable Movie Section */
 .movie-section {
   margin-bottom: 40px;
 }
@@ -263,7 +262,6 @@ body, html {
   filter: brightness(80%);
 }
 
-/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -275,16 +273,21 @@ body, html {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 10px; /* 모바일 환경에서 양쪽 여백 추가 */
 }
 
 .modal-content {
   background: white;
   padding: 20px;
   border-radius: 10px;
-  width: 300px;
-  max-width: 90%;
+  width: 100%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
   text-align: center;
   position: relative;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  padding-top: 60px;
 }
 
 .modal-content img {
@@ -294,22 +297,71 @@ body, html {
 
 .modal-content h2 {
   margin-top: 15px;
+  font-size: 1.5rem;
 }
 
 .modal-content p {
   font-size: 1rem;
   color: #333;
+  margin-bottom: 15px;
+  line-height: 1.4;
+}
+
+.modal-content button {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px 0;
+  background: #e50914;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.modal-content button:hover {
+  background: #b20710;
 }
 
 .close-button {
   position: absolute;
   top: 10px;
-  right: 10px;
-  background: #f00;
-  color: white;
+  right: 5px;
+  background: transparent;
+  color: #333;
   border: none;
   border-radius: 50%;
-  padding: 5px 10px;
   cursor: pointer;
+  z-index: 20;
+  font-size: 1.5rem;
+  line-height: 1;
+  padding: 5px;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.close-button:hover {
+  transform: scale(1.2);
+  color: #f00;
+}
+
+@media (max-width: 768px) {
+  .modal-content h2 {
+    font-size: 1.2rem;
+  }
+
+  .modal-content p {
+    font-size: 0.9rem;
+  }
+
+  .modal-content button {
+    font-size: 0.9rem;
+  }
+
+  .close-button {
+    font-size: 1.2rem;
+    padding: 8px;
+  }
 }
 </style>
