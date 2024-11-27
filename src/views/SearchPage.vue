@@ -33,7 +33,6 @@
           <button class="add-to-wishlist" @click="addToWishlist(movie)">
             찜하기
           </button>
-          <h3>{{ movie.title }}</h3>
         </div>
       </div>
       <div class="pagination">
@@ -45,7 +44,6 @@
     <div v-else>
       <p>영화 데이터를 불러올 수 없습니다.</p>
     </div>
-    <button class="go-to-wishlist" @click="goToWishlist">위시리스트 보기</button>
   </div>
 </template>
 
@@ -71,7 +69,7 @@ export default {
       selectedRating: '',
       selectedSort: 'popularity.desc',
       loading: false,
-      wishlist: JSON.parse(localStorage.getItem('wishlist')) || [], // 위시리스트 초기화
+      wishlist: JSON.parse(localStorage.getItem('wishlist')) || [],
     };
   },
   methods: {
@@ -147,9 +145,6 @@ export default {
       this.selectedSort = 'popularity.desc';
       this.applyFilters();
     },
-    goToWishlist() {
-      this.$router.push('/wishlist'); // 위시리스트 페이지로 이동
-    },
   },
   mounted() {
     const storedUser = localStorage.getItem('currentUser');
@@ -183,6 +178,11 @@ export default {
   justify-content: center;
 }
 
+.movie-card {
+  text-align: center;
+  padding-bottom: 30px;
+}
+
 .movie-card img {
   width: 150px;
   height: 225px;
@@ -190,11 +190,27 @@ export default {
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom: 20px;
 }
 
 .movie-card img:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.add-to-wishlist {
+  background-color: #e50914;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+}
+
+.add-to-wishlist:hover {
+  background-color: #b20710;
 }
 
 .pagination {
@@ -227,45 +243,5 @@ export default {
 .pagination span {
   display: flex;
   align-items: center;
-}
-
-.movie-card {
-  position: relative;
-  text-align: center;
-}
-
-.add-to-wishlist {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #e50914;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.3s;
-}
-
-.add-to-wishlist:hover {
-  background-color: #b20710;
-}
-
-.go-to-wishlist {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background-color: #e50914;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s;
-}
-
-.go-to-wishlist:hover {
-  background-color: #b20710;
 }
 </style>
