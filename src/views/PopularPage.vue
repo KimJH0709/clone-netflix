@@ -1,6 +1,5 @@
 <template>
-  <div class="page-container">
-    <!-- View Selector -->
+  <div class="page-container" @scroll.passive="handleScroll">
     <div class="view-selector">
       <button :class="{ active: isTableView }" @click="setTableView">
         <i class="fas fa-th"></i> Table View
@@ -10,16 +9,12 @@
       </button>
     </div>
 
-    <!-- Table View -->
     <div v-if="isTableView" class="table-view">
-      <div v-if="paginatedMovies.length" class="movies-grid">
-        <div v-for="movie in paginatedMovies" :key="movie.id" class="movie-card">
+      <div v-if="movies.length" class="movies-grid">
+        <div v-for="movie in movies" :key="movie.id" class="movie-card">
           <img :src="`https://image.tmdb.org/t/p/w200${movie.poster_path}`" :alt="movie.title" />
           <button class="add-to-wishlist" @click="addToWishlist(movie)">찜하기</button>
         </div>
-      </div>
-      <div v-else>
-        <p>영화 데이터를 불러올 수 없습니다.</p>
       </div>
       <div class="pagination">
         <button @click="prevPage" :disabled="currentPage === 1">이전</button>
@@ -28,18 +23,14 @@
       </div>
     </div>
 
-    <!-- Infinite Scroll View -->
     <div v-else class="infinite-scroll-view">
-      <div v-if="infiniteMovies.length" class="movies-grid">
-        <div v-for="movie in infiniteMovies" :key="movie.id" class="movie-card">
+      <div v-if="movies.length" class="movies-grid">
+        <div v-for="movie in movies" :key="movie.id" class="movie-card">
           <img :src="`https://image.tmdb.org/t/p/w200${movie.poster_path}`" :alt="movie.title" />
           <button class="add-to-wishlist" @click="addToWishlist(movie)">찜하기</button>
         </div>
+        <div v-if="loading" class="loading">로딩 중...</div>
       </div>
-      <div v-else>
-        <p>영화 데이터를 불러올 수 없습니다.</p>
-      </div>
-      <div v-if="loading" class="loading">로딩 중...</div>
     </div>
   </div>
 </template>
@@ -53,20 +44,16 @@ export default {
     return {
       movies: [],
       currentPage: 1,
-      moviesPerPage: 15,
       totalPages: 0,
       isTableView: true,
       loading: false,
       currentUser: null,
     };
   },
-  computed: {
-    paginatedMovies() {
-      return this.movies;
-    },
-  },
   methods: {
     async fetchMovies(page = 1) {
+      if (this.loading) return;
+
       try {
         const { currentUser } = this;
         if (!currentUser || !currentUser.password) {
@@ -82,7 +69,11 @@ export default {
         );
         this.loading = false;
 
-        this.movies = response.data.results;
+        if (this.isTableView) {
+          this.movies = response.data.results;
+        } else {
+          this.movies = [...this.movies, ...response.data.results];
+        }
         this.totalPages = response.data.total_pages;
       } catch (error) {
         this.loading = false;
@@ -92,24 +83,38 @@ export default {
     },
     setTableView() {
       this.isTableView = true;
+      this.movies = [];
       this.currentPage = 1;
       this.fetchMovies(this.currentPage);
     },
     setInfiniteScrollView() {
       this.isTableView = false;
       this.movies = [];
-      this.fetchMovies();
+      this.currentPage = 1;
+      this.fetchMovies(this.currentPage);
     },
-    async prevPage() {
+    prevPage() {
       if (this.currentPage > 1) {
         this.currentPage -= 1;
-        await this.fetchMovies(this.currentPage);
+        this.fetchMovies(this.currentPage);
       }
     },
-    async nextPage() {
+    nextPage() {
       if (this.currentPage < this.totalPages) {
         this.currentPage += 1;
-        await this.fetchMovies(this.currentPage);
+        this.fetchMovies(this.currentPage);
+      }
+    },
+    handleScroll() {
+      const scrollTop = window.scrollY;
+      const { clientHeight } = document.documentElement;
+      const { scrollHeight } = document.documentElement;
+
+      if (scrollTop + clientHeight >= scrollHeight - 50 && !this.isTableView) {
+        if (this.currentPage < this.totalPages && !this.loading) {
+          this.currentPage += 1;
+          this.fetchMovies(this.currentPage);
+        }
       }
     },
     addToWishlist(movie) {
@@ -140,6 +145,10 @@ export default {
       this.$router.push('/signin');
     }
     this.fetchMovies(this.currentPage);
+    window.addEventListener('scroll', this.handleScroll);
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.handleScroll);
   },
 };
 </script>
