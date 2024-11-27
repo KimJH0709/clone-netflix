@@ -49,7 +49,7 @@ export default {
   name: 'SearchPage',
   data() {
     return {
-      movies: [], // 모든 페이지에서 누적된 영화 데이터
+      movies: [], // 현재 페이지의 영화 데이터만 저장
       currentPage: 1,
       moviesPerPage: 10, // 한 페이지에 표시할 영화 수
       totalPages: 1, // 전체 페이지 수 계산
@@ -68,8 +68,6 @@ export default {
   },
   methods: {
     async fetchMovies() {
-      if (this.loading || this.currentPage > this.totalPages) return;
-
       try {
         const apiKey = JSON.parse(localStorage.getItem('currentUser')).password;
 
@@ -81,13 +79,12 @@ export default {
             sort_by: this.selectedSort,
             with_genres: this.selectedGenre,
             'vote_average.gte': this.selectedRating,
-            page: this.currentPage,
+            page: this.currentPage, // 현재 페이지에 해당하는 데이터만 요청
           },
         });
         this.loading = false;
 
-        // 새 데이터를 기존 데이터에 추가
-        this.movies = [...this.movies, ...response.data.results];
+        this.movies = response.data.results;
         this.totalPages = Math.ceil(response.data.total_results / this.moviesPerPage);
       } catch (error) {
         this.loading = false;
@@ -131,6 +128,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .filters {
   display: flex;
@@ -157,9 +155,10 @@ export default {
 }
 
 .table-cell img {
-  width: 150px; /* 고정된 너비 */
-  height: 225px; /* 고정된 높이 */
-  object-fit: cover; /* 이미지가 잘리지 않고 비율에 맞게 조정 */
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
   border-radius: 10px;
 }
 
