@@ -2,10 +2,10 @@
   <div class="page-container" @scroll.passive="handleScroll">
     <div class="view-selector">
       <button :class="{ active: isTableView }" @click="setTableView">
-        <i class="fas fa-th"></i> Table View
+        <i class="fas fa-th"></i> 테이블뷰
       </button>
       <button :class="{ active: !isTableView }" @click="setInfiniteScrollView">
-        <i class="fas fa-stream"></i> Infinite Scroll View
+        <i class="fas fa-stream"></i> 스크롤뷰
       </button>
     </div>
 
@@ -161,7 +161,7 @@ export default {
 
 .view-selector {
   display: flex;
-  justify-content: flex-end;
+  justify-content: right;
   margin-bottom: 20px;
   gap: 10px;
 }
@@ -245,8 +245,8 @@ export default {
 
 @media (max-width: 768px) {
   .view-selector {
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
+    justify-content: center;
   }
 
   .movies-grid {
@@ -276,6 +276,11 @@ export default {
 }
 
 @media (max-width: 425px) {
+  .view-selector {
+    flex-direction: row;
+    justify-content: center;
+  }
+
   .movies-grid {
     grid-template-columns: repeat(4, 1fr);
     gap: 10px;
