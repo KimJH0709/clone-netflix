@@ -136,6 +136,8 @@ export default {
         .catch((error) => {
           console.error('Failed to fetch latest movies:', error);
         });
+    } else {
+      this.$router.push('/signin');
     }
 
     this.startAutoSlide();
