@@ -1,6 +1,5 @@
 <template>
   <div class="search-page">
-    <h1>찾아보기</h1>
     <div class="filters">
       <select v-model="selectedGenre" @change="applyFilters">
         <option value="">장르 선택</option>
@@ -23,10 +22,16 @@
       <button @click="resetFilters">초기화</button>
     </div>
 
-    <div class="table-view" v-if="movies.length">
-      <div v-for="row in chunkMovies(movies, 5)" :key="row[0]?.id" class="table-row">
-        <div v-for="movie in row" :key="movie.id" class="table-cell">
-          <img :src="`https://image.tmdb.org/t/p/w200${movie.poster_path}`" :alt="movie.title" />
+    <div v-if="movies.length">
+      <div class="movies-grid">
+        <div v-for="movie in movies" :key="movie.id" class="movie-card">
+          <img
+            :src="`https://image.tmdb.org/t/p/w200${movie.poster_path}`"
+            :alt="movie.title"
+          />
+          <button class="add-to-wishlist" @click="addToWishlist(movie)">
+            찜하기
+          </button>
         </div>
       </div>
       <div class="pagination">
@@ -63,6 +68,7 @@ export default {
       selectedRating: '',
       selectedSort: 'popularity.desc',
       loading: false,
+      wishlist: JSON.parse(localStorage.getItem('wishlist')) || [],
     };
   },
   methods: {
@@ -71,21 +77,26 @@ export default {
         const apiKey = JSON.parse(localStorage.getItem('currentUser')).password;
 
         this.loading = true;
-        const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
-          params: {
-            api_key: apiKey,
-            language: 'ko-KR',
-            sort_by: this.selectedSort,
-            with_genres: this.selectedGenre,
-            'vote_average.gte': this.selectedRating,
-            page: this.currentPage,
+        const response = await axios.get(
+          'https://api.themoviedb.org/3/discover/movie',
+          {
+            params: {
+              api_key: apiKey,
+              language: 'ko-KR',
+              sort_by: this.selectedSort,
+              with_genres: this.selectedGenre,
+              'vote_average.gte': this.selectedRating,
+              page: this.currentPage,
+            },
           },
-        });
+        );
         this.loading = false;
 
         this.movies = response.data.results;
 
-        const calculatedTotalPages = Math.ceil(response.data.total_results / this.moviesPerPage);
+        const calculatedTotalPages = Math.ceil(
+          response.data.total_results / this.moviesPerPage,
+        );
         this.totalPages = Math.min(calculatedTotalPages, 10);
       } catch (error) {
         this.loading = false;
@@ -93,12 +104,22 @@ export default {
         alert('영화 데이터를 가져오는 데 실패했습니다.');
       }
     },
-    chunkMovies(movies, chunkSize) {
-      const chunks = [];
-      for (let i = 0; i < movies.length; i += chunkSize) {
-        chunks.push(movies.slice(i, i + chunkSize));
+    addToWishlist(movie) {
+      if (!this.currentUser) {
+        alert('로그인이 필요합니다.');
+        return;
       }
-      return chunks;
+
+      const wishlistKey = `wishlist_${this.currentUser.email}`;
+      const wishlist = JSON.parse(localStorage.getItem(wishlistKey)) || [];
+
+      if (!wishlist.some((item) => item.id === movie.id)) {
+        wishlist.push(movie);
+        localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
+        alert(`${movie.title}이(가) 위시리스트에 추가되었습니다.`);
+      } else {
+        alert('이미 위시리스트에 추가된 영화입니다.');
+      }
     },
     prevPage() {
       if (this.currentPage > 1) {
@@ -125,9 +146,14 @@ export default {
     },
   },
   mounted() {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      this.currentUser = JSON.parse(storedUser);
+    }
     this.fetchMovies();
   },
 };
+
 </script>
 
 <style scoped>
@@ -135,6 +161,7 @@ export default {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+  justify-content: flex-end;
 }
 
 .filters select,
@@ -143,24 +170,45 @@ export default {
   font-size: 1rem;
 }
 
-.table-view {
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  padding: 0 20px;
+  justify-content: center;
+}
+
+.movie-card {
+  text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-}
-
-.table-row {
-  display: flex;
-  justify-content: space-between;
+  align-items: center;
   gap: 10px;
+  padding-bottom: 10px;
 }
 
-.table-cell img {
+.movie-card img {
   width: 150px;
   height: 225px;
   object-fit: cover;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: none;
+}
+
+.add-to-wishlist {
+  background-color: #e50914;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+}
+
+.add-to-wishlist:hover {
+  background-color: #b20710;
 }
 
 .pagination {
@@ -177,6 +225,11 @@ export default {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #b20710;
 }
 
 .pagination button:disabled {
