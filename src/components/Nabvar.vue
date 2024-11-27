@@ -16,10 +16,12 @@
         <li><router-link to="/popular" @click="closeMenu">대세 컨텐츠</router-link></li>
         <li><router-link to="/search" @click="closeMenu">찾아보기</router-link></li>
         <li><router-link to="/wishlist" @click="closeMenu">내가 찜한 리스트</router-link></li>
-        <li v-if="currentUser" class="mobile-logout-container">
+        <li v-if="currentUser && isMobile" class="mobile-logout-container">
           <button @click="logout" class="auth-button mobile-logout">로그아웃</button>
         </li>
       </ul>
+
+      <button v-if="currentUser && !isMobile" @click="logout" class="auth-button">로그아웃</button>
     </nav>
     <div class="content"></div>
   </div>
@@ -32,6 +34,7 @@ export default {
     return {
       currentUser: null,
       isMenuOpen: false,
+      isMobile: false,
     };
   },
   methods: {
@@ -47,9 +50,17 @@ export default {
     closeMenu() {
       this.isMenuOpen = false;
     },
+    updateIsMobile() {
+      this.isMobile = window.innerWidth <= 768;
+    },
   },
   mounted() {
     this.currentUser = localStorage.getItem('currentUser');
+    this.updateIsMobile();
+    window.addEventListener('resize', this.updateIsMobile);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.updateIsMobile);
   },
 };
 </script>
@@ -171,6 +182,10 @@ export default {
   background-color: #f40612;
 }
 
+.content {
+  padding-top: 60px;
+}
+
 @media (max-width: 768px) {
   .hamburger-button {
     display: flex;
@@ -185,7 +200,11 @@ export default {
   }
 
   .auth-button {
-    margin-left: 0;
+    display: none;
+  }
+
+  .content {
+    padding-top: 50px;
   }
 }
 </style>
