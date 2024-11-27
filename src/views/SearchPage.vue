@@ -1,6 +1,5 @@
 <template>
   <div class="search-page">
-    <h1>찾아보기</h1>
     <div class="filters">
       <select v-model="selectedGenre" @change="applyFilters">
         <option value="">장르 선택</option>
@@ -162,6 +161,7 @@ export default {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+  justify-content: flex-end;
 }
 
 .filters select,
