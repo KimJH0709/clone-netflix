@@ -71,10 +71,11 @@ export default {
 
         if (this.isTableView) {
           this.movies = response.data.results;
+          this.totalPages = Math.min(response.data.total_pages, 10);
         } else {
           this.movies = [...this.movies, ...response.data.results];
+          this.totalPages = response.data.total_pages;
         }
-        this.totalPages = response.data.total_pages;
       } catch (error) {
         this.loading = false;
         console.error('영화 데이터를 가져오는 데 실패했습니다:', error);
