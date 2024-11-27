@@ -236,9 +236,65 @@ export default {
 .pagination button:hover:not(:disabled) {
   background-color: #b20710;
 }
+
 .pagination button:disabled {
   background-color: #ddd;
   color: #999;
   cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .view-selector {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .movies-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+  }
+
+  .movie-card img {
+    width: 90%;
+    aspect-ratio: 2 / 3;
+  }
+
+  .add-to-wishlist {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .pagination button {
+    width: 100%;
+    padding: 8px 0;
+  }
+}
+
+@media (max-width: 425px) {
+  .movies-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .movie-card img {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+  }
+
+  .view-selector button {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+  }
+
+  .pagination button {
+    width: 100%;
+    padding: 8px 0;
+    font-size: 0.8rem;
+  }
 }
 </style>
