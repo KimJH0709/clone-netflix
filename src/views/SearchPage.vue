@@ -26,7 +26,14 @@
     <div v-if="movies.length">
       <div class="movies-grid">
         <div v-for="movie in movies" :key="movie.id" class="movie-card">
-          <img :src="`https://image.tmdb.org/t/p/w200${movie.poster_path}`" :alt="movie.title" />
+          <img
+            :src="`https://image.tmdb.org/t/p/w200${movie.poster_path}`"
+            :alt="movie.title"
+            @click="toggleBookmark(movie.id)"
+          />
+          <div class="bookmark-button" v-if="bookmarkedMovies.includes(movie.id)">
+            <button @click="bookmarkMovie(movie)">찜하기</button>
+          </div>
           <h3>{{ movie.title }}</h3>
         </div>
       </div>
@@ -64,6 +71,7 @@ export default {
       selectedRating: '',
       selectedSort: 'popularity.desc',
       loading: false,
+      bookmarkedMovies: [], // 찜하기 상태 저장
     };
   },
   methods: {
@@ -72,21 +80,26 @@ export default {
         const apiKey = JSON.parse(localStorage.getItem('currentUser')).password;
 
         this.loading = true;
-        const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
-          params: {
-            api_key: apiKey,
-            language: 'ko-KR',
-            sort_by: this.selectedSort,
-            with_genres: this.selectedGenre,
-            'vote_average.gte': this.selectedRating,
-            page: this.currentPage,
+        const response = await axios.get(
+          'https://api.themoviedb.org/3/discover/movie',
+          {
+            params: {
+              api_key: apiKey,
+              language: 'ko-KR',
+              sort_by: this.selectedSort,
+              with_genres: this.selectedGenre,
+              'vote_average.gte': this.selectedRating,
+              page: this.currentPage,
+            },
           },
-        });
+        );
         this.loading = false;
 
         this.movies = response.data.results;
 
-        const calculatedTotalPages = Math.ceil(response.data.total_results / this.moviesPerPage);
+        const calculatedTotalPages = Math.ceil(
+          response.data.total_results / this.moviesPerPage,
+        );
         this.totalPages = Math.min(calculatedTotalPages, 10);
       } catch (error) {
         this.loading = false;
@@ -94,12 +107,16 @@ export default {
         alert('영화 데이터를 가져오는 데 실패했습니다.');
       }
     },
-    chunkMovies(movies, chunkSize) {
-      const chunks = [];
-      for (let i = 0; i < movies.length; i += chunkSize) {
-        chunks.push(movies.slice(i, i + chunkSize));
+    toggleBookmark(movieId) {
+      const index = this.bookmarkedMovies.indexOf(movieId);
+      if (index === -1) {
+        this.bookmarkedMovies.push(movieId);
+      } else {
+        this.bookmarkedMovies.splice(index, 1);
       }
-      return chunks;
+    },
+    bookmarkMovie(movie) {
+      console.log(`${movie.title}가 찜 목록에 추가되었습니다.`);
     },
     prevPage() {
       if (this.currentPage > 1) {
@@ -129,6 +146,7 @@ export default {
     this.fetchMovies();
   },
 };
+
 </script>
 
 <style scoped>
@@ -196,5 +214,34 @@ export default {
 .pagination span {
   display: flex;
   align-items: center;
+}
+
+.movie-card {
+  position: relative;
+  text-align: center;
+}
+
+.bookmark-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bookmark-button button {
+  background-color: #e50914;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+}
+
+.bookmark-button button:hover {
+  background-color: #b20710;
 }
 </style>
