@@ -29,11 +29,10 @@
           <img
             :src="`https://image.tmdb.org/t/p/w200${movie.poster_path}`"
             :alt="movie.title"
-            @click="toggleBookmark(movie.id)"
           />
-          <div class="bookmark-button" v-if="bookmarkedMovies.includes(movie.id)">
-            <button @click="bookmarkMovie(movie)">찜하기</button>
-          </div>
+          <button class="add-to-wishlist" @click="addToWishlist(movie)">
+            찜하기
+          </button>
           <h3>{{ movie.title }}</h3>
         </div>
       </div>
@@ -46,6 +45,7 @@
     <div v-else>
       <p>영화 데이터를 불러올 수 없습니다.</p>
     </div>
+    <button class="go-to-wishlist" @click="goToWishlist">위시리스트 보기</button>
   </div>
 </template>
 
@@ -71,7 +71,7 @@ export default {
       selectedRating: '',
       selectedSort: 'popularity.desc',
       loading: false,
-      bookmarkedMovies: [], // 찜하기 상태 저장
+      wishlist: JSON.parse(localStorage.getItem('wishlist')) || [], // 위시리스트 초기화
     };
   },
   methods: {
@@ -107,16 +107,22 @@ export default {
         alert('영화 데이터를 가져오는 데 실패했습니다.');
       }
     },
-    toggleBookmark(movieId) {
-      const index = this.bookmarkedMovies.indexOf(movieId);
-      if (index === -1) {
-        this.bookmarkedMovies.push(movieId);
-      } else {
-        this.bookmarkedMovies.splice(index, 1);
+    addToWishlist(movie) {
+      if (!this.currentUser) {
+        alert('로그인이 필요합니다.');
+        return;
       }
-    },
-    bookmarkMovie(movie) {
-      console.log(`${movie.title}가 찜 목록에 추가되었습니다.`);
+
+      const wishlistKey = `wishlist_${this.currentUser.email}`;
+      const wishlist = JSON.parse(localStorage.getItem(wishlistKey)) || [];
+
+      if (!wishlist.some((item) => item.id === movie.id)) {
+        wishlist.push(movie);
+        localStorage.setItem(wishlistKey, JSON.stringify(wishlist));
+        alert(`${movie.title}이(가) 위시리스트에 추가되었습니다.`);
+      } else {
+        alert('이미 위시리스트에 추가된 영화입니다.');
+      }
     },
     prevPage() {
       if (this.currentPage > 1) {
@@ -141,8 +147,15 @@ export default {
       this.selectedSort = 'popularity.desc';
       this.applyFilters();
     },
+    goToWishlist() {
+      this.$router.push('/wishlist'); // 위시리스트 페이지로 이동
+    },
   },
   mounted() {
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      this.currentUser = JSON.parse(storedUser);
+    }
     this.fetchMovies();
   },
 };
@@ -221,16 +234,11 @@ export default {
   text-align: center;
 }
 
-.bookmark-button {
+.add-to-wishlist {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.bookmark-button button {
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: #e50914;
   color: white;
   border: none;
@@ -241,7 +249,23 @@ export default {
   transition: background-color 0.3s;
 }
 
-.bookmark-button button:hover {
+.add-to-wishlist:hover {
+  background-color: #b20710;
+}
+
+.go-to-wishlist {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #e50914;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s;
+}
+
+.go-to-wishlist:hover {
   background-color: #b20710;
 }
 </style>
