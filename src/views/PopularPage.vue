@@ -15,7 +15,6 @@
         <div v-for="row in chunkMovies(paginatedMovies, 5)" :key="row[0]?.id" class="table-row">
           <div v-for="movie in row" :key="movie.id" class="table-cell">
             <img :src="`https://image.tmdb.org/t/p/w200${movie.poster_path}`" :alt="movie.title" />
-            <h3>{{ movie.title }}</h3>
           </div>
         </div>
       </div>
@@ -34,7 +33,6 @@
       <div v-if="infiniteMovies.length" class="movies-grid">
         <div v-for="movie in infiniteMovies" :key="movie.id" class="movie-card">
           <img :src="`https://image.tmdb.org/t/p/w200${movie.poster_path}`" :alt="movie.title" />
-          <h3>{{ movie.title }}</h3>
         </div>
         <div v-if="loading" class="loading">로딩 중...</div>
       </div>
