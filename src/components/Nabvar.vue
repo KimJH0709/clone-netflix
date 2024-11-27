@@ -2,7 +2,7 @@
   <div>
     <nav class="navbar">
       <div class="navbar-brand">
-        <a href="/" class="navbar-logo">NETFLIX</a>
+        <router-link to="/" class="navbar-logo">NETFLIX</router-link>
       </div>
 
       <button class="hamburger-button" @click="toggleMenu">
