@@ -8,14 +8,18 @@ import SearchPage from '../views/SearchPage.vue';
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: HomePage,
-    meta: { requiresAuth: true },
+    redirect: '/signin',
   },
   {
     path: '/signin',
     name: 'Auth',
     component: AuthPage,
+  },
+  {
+    path: '/home',
+    name: 'Home',
+    component: HomePage,
+    meta: { requiresAuth: true },
   },
   {
     path: '/wishlist',
@@ -32,10 +36,14 @@ const routes = [
     name: 'Search',
     component: SearchPage,
   },
+  {
+    path: '/:catchAll(.*)',
+    redirect: '/signin',
+  },
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(process.env.NODE_ENV === 'production' ? '/clone-netflix/' : '/'),
   routes,
 });
 
