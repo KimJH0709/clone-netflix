@@ -3,8 +3,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main # main 브랜치에 변경사항이 생길 때 실행
-  workflow_dispatch: # 수동 실행 가능
+      - main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -17,16 +17,16 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16 # Node.js 버전 설정
+          node-version: 16
 
       - name: Install dependencies
-        run: npm install # npm 또는 yarn으로 프로젝트 의존성 설치
+        run: npm install
 
       - name: Build project
-        run: npm run build # 프로젝트 빌드 (예: React, Vue)
+        run: npm run build
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          publish_dir: ./dist # 빌드 결과물이 있는 디렉토리
+          publish_dir: ./dist
