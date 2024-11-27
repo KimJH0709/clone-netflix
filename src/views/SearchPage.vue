@@ -166,6 +166,7 @@ export default {
   gap: 10px;
   margin-bottom: 20px;
   justify-content: flex-end;
+  flex-wrap: wrap;
 }
 
 .filters select,
@@ -239,5 +240,65 @@ export default {
 .pagination span {
   display: flex;
   align-items: center;
+}
+
+@media (max-width: 768px) {
+  .filters {
+    justify-content: flex-start;
+    flex-direction: column;
+  }
+
+  .movies-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+  }
+
+  .movie-card img {
+    width: 90%;
+    aspect-ratio: 2 / 3;
+  }
+
+  .add-to-wishlist {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .pagination button {
+    width: 100%;
+    padding: 8px 0;
+  }
+}
+
+@media (max-width: 425px) {
+  .filters {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .movies-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .movie-card img {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+  }
+
+  .add-to-wishlist {
+    padding: 6px 8px;
+    font-size: 0.8rem;
+  }
+
+  .pagination button {
+    width: 100%;
+    padding: 8px 0;
+    font-size: 0.8rem;
+  }
 }
 </style>
