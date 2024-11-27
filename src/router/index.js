@@ -7,16 +7,12 @@ import SearchPage from '../views/SearchPage.vue';
 
 const routes = [
   {
-    path: '/',
-    redirect: '/signin',
-  },
-  {
     path: '/signin',
     name: 'Auth',
     component: AuthPage,
   },
   {
-    path: '/home',
+    path: '/',
     name: 'Home',
     component: HomePage,
     meta: { requiresAuth: true },
