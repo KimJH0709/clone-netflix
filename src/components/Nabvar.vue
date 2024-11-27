@@ -1,19 +1,27 @@
 <template>
-  <div> <!-- 모든 내용을 감싸는 루트 요소 추가 -->
+  <div>
     <nav class="navbar">
       <div class="navbar-brand">
-        <a href="/" class="navbar-logo">MyApp</a>
+        <a href="/" class="navbar-logo">NETFLIX</a>
       </div>
-      <ul class="navbar-links">
-        <li><router-link to="/">메인 페이지</router-link></li>
-        <li><router-link to="/popular">대세 컨텐츠 페이지</router-link></li>
-        <li><router-link to="/search">찾아보기 페이지</router-link></li>
-        <li><router-link to="/wishlist">내가 찜한 리스트 페이지</router-link></li>
+
+      <button class="hamburger-button" @click="toggleMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <ul class="navbar-links" :class="{ open: isMenuOpen }">
+        <li><router-link to="/" @click="closeMenu">홈</router-link></li>
+        <li><router-link to="/popular" @click="closeMenu">대세 컨텐츠</router-link></li>
+        <li><router-link to="/search" @click="closeMenu">찾아보기</router-link></li>
+        <li><router-link to="/wishlist" @click="closeMenu">내가 찜한 리스트</router-link></li>
+        <li v-if="currentUser" class="mobile-logout-container">
+          <button @click="logout" class="auth-button mobile-logout">로그아웃</button>
+        </li>
       </ul>
-      <button v-if="currentUser" @click="logout" class="auth-button">로그아웃</button>
     </nav>
-    <div class="content">
-    </div>
+    <div class="content"></div>
   </div>
 </template>
 
@@ -23,6 +31,7 @@ export default {
   data() {
     return {
       currentUser: null,
+      isMenuOpen: false,
     };
   },
   methods: {
@@ -31,6 +40,12 @@ export default {
       this.currentUser = null;
       alert('You have been logged out.');
       this.$router.push({ path: '/signin' });
+    },
+    toggleMenu() {
+      this.isMenuOpen = !this.isMenuOpen;
+    },
+    closeMenu() {
+      this.isMenuOpen = false;
     },
   },
   mounted() {
@@ -42,7 +57,7 @@ export default {
 <style scoped>
 .navbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   padding: 10px 20px;
   background-color: #333;
@@ -60,6 +75,27 @@ export default {
   color: white;
   font-size: 1.5rem;
   font-weight: bold;
+  margin-right: 20px;
+}
+
+.hamburger-button {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 25px;
+  height: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.hamburger-button span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background: white;
+  border-radius: 2px;
 }
 
 .navbar-links {
@@ -82,19 +118,74 @@ export default {
   color: #ddd;
 }
 
+.navbar-links.open {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  background-color: #333;
+  padding: 10px 0;
+  z-index: 999;
+}
+
+.navbar-links.open li {
+  margin: 10px 0;
+  text-align: center;
+}
+
+.mobile-logout-container {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.auth-button.mobile-logout {
+  display: block;
+  width: 90%;
+  margin: 0 auto;
+  background-color: #e50914;
+  color: white;
+  border: none;
+  padding: 10px 0;
+  text-align: center;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.auth-button.mobile-logout:hover {
+  background-color: #f40612;
+}
+
 .auth-button {
   background-color: #e50914;
-  color: #fff;
+  color: white;
   border: none;
   padding: 10px 20px;
   cursor: pointer;
+  margin-left: auto;
 }
 
 .auth-button:hover {
   background-color: #f40612;
 }
 
-.content {
-  padding-top: 60px;
+@media (max-width: 768px) {
+  .hamburger-button {
+    display: flex;
+  }
+
+  .navbar-links {
+    display: none;
+  }
+
+  .navbar-links.open {
+    display: flex;
+  }
+
+  .auth-button {
+    margin-left: 0;
+  }
 }
 </style>
