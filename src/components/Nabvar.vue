@@ -2,7 +2,7 @@
   <div>
     <nav class="navbar">
       <div class="navbar-brand">
-        <a href="/" class="navbar-logo">MyApp</a>
+        <a href="/" class="navbar-logo">NETFLIX</a>
       </div>
       <ul class="navbar-links">
         <li><router-link to="/">홈</router-link></li>
@@ -42,7 +42,7 @@ export default {
 <style scoped>
 .navbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   padding: 10px 20px;
   background-color: #333;
@@ -60,6 +60,7 @@ export default {
   color: white;
   font-size: 1.5rem;
   font-weight: bold;
+  margin-right: 20px;
 }
 
 .navbar-links {
@@ -88,6 +89,7 @@ export default {
   border: none;
   padding: 10px 20px;
   cursor: pointer;
+  margin-left: auto;
 }
 
 .auth-button:hover {
