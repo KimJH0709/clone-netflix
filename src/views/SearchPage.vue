@@ -193,12 +193,7 @@ export default {
   object-fit: cover;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.movie-card img:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  transition: none;
 }
 
 .add-to-wishlist {
