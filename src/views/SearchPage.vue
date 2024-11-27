@@ -23,8 +23,8 @@
       <button @click="resetFilters">초기화</button>
     </div>
 
-    <div v-if="paginatedMovies.length" class="table-view">
-      <div v-for="row in chunkMovies(paginatedMovies, 5)" :key="row[0]?.id" class="table-row">
+    <div class="table-view" v-if="movies.length">
+      <div v-for="row in chunkMovies(movies, 5)" :key="row[0]?.id" class="table-row">
         <div v-for="movie in row" :key="movie.id" class="table-cell">
           <img :src="`https://image.tmdb.org/t/p/w200${movie.poster_path}`" :alt="movie.title" />
           <h3>{{ movie.title }}</h3>
@@ -49,10 +49,10 @@ export default {
   name: 'SearchPage',
   data() {
     return {
-      movies: [],
+      movies: [], // 모든 페이지에서 누적된 영화 데이터
       currentPage: 1,
-      moviesPerPage: 10,
-      totalPages: 10,
+      moviesPerPage: 10, // 한 페이지에 표시할 영화 수
+      totalPages: 1, // 전체 페이지 수 계산
       genres: [
         { id: 28, name: '액션' },
         { id: 12, name: '모험' },
@@ -63,19 +63,17 @@ export default {
       selectedGenre: '',
       selectedRating: '',
       selectedSort: 'popularity.desc',
+      loading: false,
     };
-  },
-  computed: {
-    paginatedMovies() {
-      const start = (this.currentPage - 1) * this.moviesPerPage;
-      const end = start + this.moviesPerPage;
-      return this.movies.slice(start, end);
-    },
   },
   methods: {
     async fetchMovies() {
+      if (this.loading || this.currentPage > this.totalPages) return;
+
       try {
         const apiKey = JSON.parse(localStorage.getItem('currentUser')).password;
+
+        this.loading = true;
         const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
           params: {
             api_key: apiKey,
@@ -83,12 +81,16 @@ export default {
             sort_by: this.selectedSort,
             with_genres: this.selectedGenre,
             'vote_average.gte': this.selectedRating,
-            page: 1,
+            page: this.currentPage,
           },
         });
-        this.movies = response.data.results
-          .slice(0, this.moviesPerPage * this.totalPages);
+        this.loading = false;
+
+        // 새 데이터를 기존 데이터에 추가
+        this.movies = [...this.movies, ...response.data.results];
+        this.totalPages = Math.ceil(response.data.total_results / this.moviesPerPage);
       } catch (error) {
+        this.loading = false;
         console.error('영화 데이터를 가져오는 데 실패했습니다:', error);
         alert('영화 데이터를 가져오는 데 실패했습니다.');
       }
@@ -103,11 +105,13 @@ export default {
     prevPage() {
       if (this.currentPage > 1) {
         this.currentPage -= 1;
+        this.fetchMovies();
       }
     },
     nextPage() {
       if (this.currentPage < this.totalPages) {
         this.currentPage += 1;
+        this.fetchMovies();
       }
     },
     applyFilters() {
@@ -127,7 +131,6 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 .filters {
   display: flex;
@@ -153,16 +156,10 @@ export default {
   gap: 10px;
 }
 
-.table-cell {
-  flex: 1;
-  text-align: center;
-}
-
 .table-cell img {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 2 / 3;
-  object-fit: cover;
+  width: 150px; /* 고정된 너비 */
+  height: 225px; /* 고정된 높이 */
+  object-fit: cover; /* 이미지가 잘리지 않고 비율에 맞게 조정 */
   border-radius: 10px;
 }
 
