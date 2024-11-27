@@ -23,10 +23,11 @@
       <button @click="resetFilters">초기화</button>
     </div>
 
-    <div class="table-view" v-if="movies.length">
-      <div v-for="row in chunkMovies(movies, 5)" :key="row[0]?.id" class="table-row">
-        <div v-for="movie in row" :key="movie.id" class="table-cell">
+    <div v-if="movies.length">
+      <div class="movies-grid">
+        <div v-for="movie in movies" :key="movie.id" class="movie-card">
           <img :src="`https://image.tmdb.org/t/p/w200${movie.poster_path}`" :alt="movie.title" />
+          <h3>{{ movie.title }}</h3>
         </div>
       </div>
       <div class="pagination">
@@ -143,24 +144,26 @@ export default {
   font-size: 1rem;
 }
 
-.table-view {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  padding: 0 20px;
+  justify-content: center;
 }
 
-.table-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.table-cell img {
+.movie-card img {
   width: 150px;
   height: 225px;
   object-fit: cover;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.movie-card img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
 
 .pagination {
@@ -177,6 +180,11 @@ export default {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #b20710;
 }
 
 .pagination button:disabled {
