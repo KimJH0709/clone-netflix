@@ -157,6 +157,10 @@ export default {
 </script>
 
 <style scoped>
+.search-page {
+  padding: 20px;
+}
+
 .filters {
   display: flex;
   gap: 10px;
@@ -174,33 +178,27 @@ export default {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 20px;
-  padding: 0 20px;
-  justify-content: center;
 }
 
 .movie-card {
-  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  padding-bottom: 10px;
 }
 
 .movie-card img {
-  width: 150px;
-  height: 225px;
+  aspect-ratio: 2 / 3;
   object-fit: cover;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: none;
+  width: 100%;
 }
 
 .add-to-wishlist {
+  padding: 8px 12px;
   background-color: #e50914;
   color: white;
   border: none;
-  padding: 8px 12px;
   border-radius: 5px;
   cursor: pointer;
   font-size: 0.9rem;
