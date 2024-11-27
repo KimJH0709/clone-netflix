@@ -1,6 +1,6 @@
 <template>
   <div class="homepage">
-    <!-- Top 5 Popular Movies Section -->
+
     <div v-if="topMovies.length" class="top-movies-container">
       <button class="arrow left-arrow" @click="prevMovie">〈</button>
       <div class="top-movie">
@@ -15,7 +15,6 @@
       <button class="arrow right-arrow" @click="nextMovie">〉</button>
     </div>
 
-    <!-- Popular Movies -->
     <div v-if="popularMovies.length" class="movie-section">
       <h2>인기 영화</h2>
       <div class="movie-scroll-container">
@@ -30,7 +29,6 @@
       </div>
     </div>
 
-    <!-- Latest Movies -->
     <div v-if="latestMovies.length" class="movie-section">
       <h2>최신 영화</h2>
       <div class="movie-scroll-container">
@@ -45,7 +43,6 @@
       </div>
     </div>
 
-    <!-- Movie Detail Modal -->
     <div v-if="isModalOpen" class="modal-overlay" @click="closeModal">
       <div class="modal-content" @click.stop>
         <button class="close-button" @click="closeModal">X</button>
@@ -236,6 +233,12 @@ body, html {
 
 .movie-section {
   margin-bottom: 40px;
+}
+
+.movie-section h2 {
+  color: white;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
 }
 
 .movie-scroll-container {

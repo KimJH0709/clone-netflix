@@ -123,6 +123,13 @@ button:hover {
   background-color: #ff3333;
 }
 
+.pagination span {
+  color: white;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+}
+
 .pagination {
   display: flex;
   justify-content: center;
