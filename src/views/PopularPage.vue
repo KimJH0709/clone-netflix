@@ -199,7 +199,7 @@ export default {
   aspect-ratio: 2 / 3;
   object-fit: cover;
   border-radius: 10px;
-  width: 100%; /* 이미지 크기를 부모 요소에 맞춤 */
+  width: 100%;
 }
 
 .add-to-wishlist {
