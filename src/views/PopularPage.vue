@@ -235,4 +235,9 @@ export default {
 .pagination button:hover:not(:disabled) {
   background-color: #b20710;
 }
+.pagination button:disabled {
+  background-color: #ddd;
+  color: #999;
+  cursor: not-allowed;
+}
 </style>
