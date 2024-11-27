@@ -1,6 +1,5 @@
 <template>
   <div class="popular-page">
-    <h1 class="page-title">대세 콘텐츠</h1>
     <div class="view-selector">
       <button :class="{ active: isTableView }" @click="setTableView">
         <i class="fas fa-th"></i> Table View
