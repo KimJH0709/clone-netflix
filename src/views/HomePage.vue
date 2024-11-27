@@ -280,14 +280,14 @@ body, html {
   background: white;
   padding: 20px;
   border-radius: 10px;
-  width: 100%; /* 모바일 화면에서도 가득 차도록 설정 */
-  max-width: 400px; /* 최대 너비 제한 */
-  max-height: 90vh; /* 최대 높이를 화면의 90%로 제한 */
-  overflow-y: auto; /* 내용이 많으면 스크롤 가능 */
+  width: 100%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
   text-align: center;
   position: relative;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  padding-top: 50px; /* 닫기 버튼 영역 확보 */
+  padding-top: 60px;
 }
 
 .modal-content img {
@@ -328,7 +328,7 @@ body, html {
 .close-button {
   position: absolute;
   top: 10px;
-  right: 10px;
+  right: 5px;
   background: transparent;
   color: #333;
   border: none;
@@ -344,11 +344,6 @@ body, html {
 .close-button:hover {
   transform: scale(1.2);
   color: #f00;
-}
-
-.close-button::before {
-  content: '✖';
-  font-family: Arial, sans-serif;
 }
 
 @media (max-width: 768px) {
