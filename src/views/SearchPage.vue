@@ -180,7 +180,11 @@ export default {
 
 .movie-card {
   text-align: center;
-  padding-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
 }
 
 .movie-card img {
@@ -190,7 +194,6 @@ export default {
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
-  margin-bottom: 20px;
 }
 
 .movie-card img:hover {
