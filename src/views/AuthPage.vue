@@ -1,7 +1,7 @@
 <template>
   <div ref="container" id="container" class="container">
     <div class="row">
-      <!-- SIGN UP -->
+
       <div class="col align-items-center flex-col sign-up">
         <div class="form-wrapper align-items-center">
           <div class="form sign-up">
@@ -182,7 +182,9 @@ export default {
 };
 </script>
 
-<style>
+<style >
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
+
 :root {
     --primary-color: #4EA685;
     --secondary-color: #57B894;
@@ -196,8 +198,6 @@ export default {
     --twitter-color: #1DA1F2;
     --insta-color: #E1306C;
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
 
 * {
     font-family: 'Poppins', sans-serif;
@@ -496,12 +496,12 @@ body {
     right: 0;
     height: 100vh;
     width: 300vw;
-    transform: translate(35%, 0);
-    background-image: linear-gradient(-45deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    transform: translate(40%, 0);
+    background-image: linear-gradient(-45deg, #2c3e50 0%, #34495e 100%);
     transition: 1s ease-in-out;
     z-index: 6;
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-    border-bottom-right-radius: max(50vw, 50vh);
+    border-bottom-right-radius: max(60vw, 60vh);
     border-top-left-radius: max(50vw, 50vh);
 }
 

@@ -32,6 +32,14 @@
         <div v-if="loading" class="loading">로딩 중...</div>
       </div>
     </div>
+
+    <button
+      v-if="!isTableView && showScrollToTop"
+      class="scroll-to-top"
+      @click="scrollToTop"
+    >
+      ↑
+    </button>
   </div>
 </template>
 
@@ -48,6 +56,7 @@ export default {
       isTableView: true,
       loading: false,
       currentUser: null,
+      showScrollToTop: false,
     };
   },
   methods: {
@@ -86,6 +95,7 @@ export default {
       this.isTableView = true;
       this.movies = [];
       this.currentPage = 1;
+      this.showScrollToTop = false;
       this.fetchMovies(this.currentPage);
     },
     setInfiniteScrollView() {
@@ -93,6 +103,28 @@ export default {
       this.movies = [];
       this.currentPage = 1;
       this.fetchMovies(this.currentPage);
+    },
+    scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    },
+    handleScroll() {
+      if (this.isTableView) return;
+
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const { clientHeight } = document.documentElement;
+      const { scrollHeight } = document.documentElement;
+
+      this.showScrollToTop = scrollTop > 250;
+
+      if (scrollTop + clientHeight >= scrollHeight - 50 && !this.loading) {
+        if (this.currentPage < this.totalPages) {
+          this.currentPage += 1;
+          this.fetchMovies(this.currentPage);
+        }
+      }
     },
     prevPage() {
       if (this.currentPage > 1) {
@@ -104,18 +136,6 @@ export default {
       if (this.currentPage < this.totalPages) {
         this.currentPage += 1;
         this.fetchMovies(this.currentPage);
-      }
-    },
-    handleScroll() {
-      const scrollTop = window.scrollY;
-      const { clientHeight } = document.documentElement;
-      const { scrollHeight } = document.documentElement;
-
-      if (scrollTop + clientHeight >= scrollHeight - 50 && !this.isTableView) {
-        if (this.currentPage < this.totalPages && !this.loading) {
-          this.currentPage += 1;
-          this.fetchMovies(this.currentPage);
-        }
       }
     },
     addToWishlist(movie) {
@@ -167,16 +187,18 @@ export default {
 }
 
 .view-selector button {
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-  background-color: #e50914;
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #ff6666;
   color: white;
+  border: none;
   border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
 }
 
 .view-selector button:hover {
-  background-color: #b20710;
+  background-color: #ff3333;
 }
 
 .view-selector button.active {
@@ -204,36 +226,18 @@ export default {
 }
 
 .add-to-wishlist {
-  padding: 12px 20px;
-  background: linear-gradient(135deg, #ff7e5f, #feb47b);
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #ff6666;
   color: white;
-  border: 2px solid #ff7e5f;
-  border-radius: 30px;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
-  font-size: 1rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: all 0.3s ease-in-out;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s;
 }
 
 .add-to-wishlist:hover {
-  background: linear-gradient(135deg, #feb47b, #ff7e5f);
-  color: #333;
-  transform: scale(1.1);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-}
-
-.add-to-wishlist:active {
-  background: linear-gradient(135deg, #ff6a45, #fe9b6f);
-  transform: scale(0.95);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-}
-
-.add-to-wishlist:focus {
-  outline: none;
-  box-shadow: 0 0 5px 3px rgba(255, 126, 95, 0.6);
+  background-color: #ff3333;
 }
 
 .pagination {
@@ -259,6 +263,34 @@ export default {
   background-color: #ddd;
   color: #999;
   cursor: not-allowed;
+}
+
+.scroll-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #e50914;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.scroll-to-top:hover {
+  background-color: #b20710;
+  transform: scale(1.1);
+}
+
+.scroll-to-top:active {
+  transform: scale(0.95);
 }
 
 @media (max-width: 768px) {
