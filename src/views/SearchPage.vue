@@ -196,18 +196,36 @@ export default {
 }
 
 .add-to-wishlist {
-  padding: 8px 12px;
-  background-color: #e50914;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #ff7e5f, #feb47b);
   color: white;
-  border: none;
-  border-radius: 5px;
+  border: 2px solid #ff7e5f;
+  border-radius: 30px;
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.3s;
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .add-to-wishlist:hover {
-  background-color: #b20710;
+  background: linear-gradient(135deg, #feb47b, #ff7e5f);
+  color: #333;
+  transform: scale(1.1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.add-to-wishlist:active {
+  background: linear-gradient(135deg, #ff6a45, #fe9b6f);
+  transform: scale(0.95);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+.add-to-wishlist:focus {
+  outline: none;
+  box-shadow: 0 0 5px 3px rgba(255, 126, 95, 0.6);
 }
 
 .pagination {
